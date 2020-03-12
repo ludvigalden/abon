@@ -1,7 +1,7 @@
 {
 	"name": "abon",
 	"description": "Complex state in React made simple 🚀",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"license": "MIT",
 	"author": "Ludvig Aldén <ludvig@tifum.com>",
 	"repository": "ludvigalden/abon",
