@@ -1,0 +1,28 @@
+{
+  "projectName": "abon",
+  "projectOwner": "ludvigalden",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "contributors": [
+    {
+      "login": "ludvigalden",
+      "name": "Ludvig Aldén",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/30798446?s=460&v=4",
+      "profile": "https://github.com/ludvigalden",
+      "contributions": [
+        "question",
+        "code",
+        "design",
+        "doc",
+        "example",
+        "ideas",
+        "review",
+        "test"
+      ]
+    }
+  ],
+  "repoType": "github"
+}

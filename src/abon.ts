@@ -1,0 +1,214 @@
+import React from "react";
+import isEqual from "lodash.isequal";
+
+import { AbonEvent } from "./abon-event";
+import { AbonMap } from "./abon-map";
+import { AbonSet } from "./abon-set";
+import { Notifier } from "./notifier";
+import { ChangeListener, UnsubscribeFn } from "./types";
+import { useClearedMemo } from "./utils";
+import { AbonDeep } from "./abon-deep";
+
+export class Abon<T> {
+    current: T;
+
+    private readonly $notifier: Notifier<T>;
+
+    constructor(initial?: T) {
+        this.current = initial as T;
+
+        Object.defineProperty(this, "$notifier", {
+            value: new Notifier(),
+            configurable: false,
+            writable: false,
+            enumerable: false,
+        });
+    }
+
+    set(value: T) {
+        if (!isEqual(this.current, value)) {
+            this.current = value;
+            this.$notifier.notify(value);
+        }
+
+        return this;
+    }
+
+    subscribe(listener: ChangeListener<T>): UnsubscribeFn {
+        return this.$notifier.subscribe(listener);
+    }
+
+    use() {
+        const listener = React.useReducer(() => Object.create(null), undefined)[1];
+
+        useClearedMemo(
+            () => this.subscribe(listener),
+            (unsubscribe) => unsubscribe(),
+            [this, listener],
+        );
+
+        return this;
+    }
+
+    useSubscription(listener: ChangeListener<T>, deps: readonly any[] = []) {
+        useClearedMemo(
+            () => this.subscribe(listener),
+            (unsubscribe) => unsubscribe(),
+            [this, ...deps],
+        );
+    }
+
+    notify() {
+        this.$notifier.notify(this.current);
+    }
+
+    static use<T>(initial?: () => T, deps: readonly any[] = []): Abon<T> {
+        return Abon.useRef(initial, deps).use();
+    }
+
+    static useRef<T>(initial?: () => T, deps: readonly any[] = []): Abon<T> {
+        return React.useMemo(() => new Abon((typeof initial === "function" ? initial() : undefined) as T), deps);
+    }
+
+    static useFrom<T>(listen: (listener: (value: T) => void) => UnsubscribeFn, initial?: () => T, deps: readonly any[] = []): Abon<T> {
+        const abon = Abon.use(initial);
+
+        useClearedMemo(
+            () => listen(abon.set.bind(abon)),
+            (unsubscribe) => unsubscribe(),
+            [this, ...deps],
+        );
+
+        return abon;
+    }
+
+    static composedSubscription(
+        listener: () => void,
+        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
+    ): UnsubscribeFn {
+        const unsubscribeFns = listen(listener);
+        return () => Array.from(unsubscribeFns).forEach((unsubscribeFn) => typeof unsubscribeFn === "function" && unsubscribeFn());
+    }
+
+    static useComposedSubscription(
+        listener: () => void,
+        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
+        deps: readonly any[] = [],
+    ) {
+        useClearedMemo(
+            () => this.composedSubscription(listener, listen),
+            (unsubscribe) => unsubscribe(),
+            deps,
+        );
+    }
+
+    static useComposedValue<T>(
+        getValue: () => T,
+        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
+        deps: readonly any[] = [],
+    ) {
+        const [value, setValue] = React.useState(getValue);
+
+        useClearedMemo(
+            () => {
+                let nextValue = getValue();
+
+                if (!isEqual(value, nextValue)) {
+                    setValue(nextValue);
+                }
+
+                return Abon.composedSubscription(() => {
+                    nextValue = getValue();
+
+                    if (!isEqual(value, nextValue)) {
+                        setValue(nextValue);
+                    }
+                }, listen);
+            },
+            (unsubscribe) => unsubscribe(),
+            deps,
+        );
+
+        return value;
+    }
+
+    static useComposedValueAsync<T>(
+        getValue: () => Promise<T>,
+        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
+        deps: readonly any[] = [],
+    ) {
+        const [value, setValue] = React.useState<T>();
+        const getting = React.useRef<symbol>();
+
+        useClearedMemo(
+            () => {
+                const gettingMemo = (getting.current = Symbol());
+
+                getValue().then((nextValue) => {
+                    if (getting.current === gettingMemo && !isEqual(value, nextValue)) {
+                        setValue(nextValue);
+                    }
+                });
+
+                return Abon.composedSubscription(() => {
+                    const gettingSubscription = (getting.current = Symbol());
+
+                    getValue().then((nextValue) => {
+                        if (getting.current === gettingSubscription && !isEqual(value, nextValue)) {
+                            setValue(nextValue);
+                        }
+                    });
+                }, listen);
+            },
+            (unsubscribe) => unsubscribe(),
+            deps,
+        );
+
+        return value;
+    }
+
+    static resolve<T>(listen: (listener: (value?: T) => void) => UnsubscribeFn): Promise<void>;
+    static resolve<T>(abon: Abon<T>): Promise<T>;
+    static resolve<T extends object>(abon: AbonDeep<T>): Promise<T>;
+    static resolve<AM extends AbonMap<any, any>>(map: AM): Promise<AM>;
+    static resolve<AS extends AbonSet<any>>(set: AS): Promise<AS>;
+    static resolve(arg: any): Promise<any> {
+        let listen: (listener: (value?: any) => void) => UnsubscribeFn;
+
+        if (arg instanceof Abon || arg instanceof AbonMap || arg instanceof AbonDeep || arg instanceof AbonSet) {
+            listen = arg.subscribe.bind(arg);
+        } else {
+            listen = arg;
+        }
+
+        let setValue: (value?: any) => void;
+        let resolveValue: any = INITIAL_VALUE;
+
+        const unsubscribe = listen((value) => {
+            if (typeof unsubscribe === "function") {
+                unsubscribe();
+            }
+
+            if (setValue) {
+                setValue(value);
+            } else {
+                resolveValue = value;
+            }
+        });
+
+        return new Promise((resolve) => {
+            if (resolveValue !== INITIAL_VALUE) {
+                resolve(resolveValue);
+            } else {
+                setValue = resolve;
+            }
+        });
+    }
+
+    static Deep = AbonDeep;
+    static Event = AbonEvent;
+    static Map = AbonMap;
+    static Set = AbonSet;
+}
+
+const INITIAL_VALUE = Symbol("Initial");

@@ -1,0 +1,14 @@
+dist
+compiled
+*.log
+coverage
+.DS_Store
+next.d.ts
+legacy.d.ts
+.idea
+*.orig
+
+node_modules
+package-lock.json
+yarn.lock
+/yarn.lock
