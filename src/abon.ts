@@ -6,7 +6,7 @@ import { AbonMap } from "./abon-map";
 import { AbonSet } from "./abon-set";
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";
-import { useClearedMemo } from "./utils";
+import { useClearedMemo, useForceUpdate } from "./utils";
 import { AbonDeep } from "./abon-deep";
 
 export class Abon<T> {
@@ -39,7 +39,7 @@ export class Abon<T> {
     }
 
     use() {
-        const listener = React.useReducer(() => Object.create(null), undefined)[1];
+        const listener = useForceUpdate();
 
         useClearedMemo(
             () => this.subscribe(listener),
@@ -106,22 +106,25 @@ export class Abon<T> {
         getValue: () => T,
         listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
         deps: readonly any[] = [],
-    ) {
-        const [value, setValue] = React.useState(getValue);
+    ): T {
+        const listener = useForceUpdate();
+        const value = React.useRef<T>();
 
         useClearedMemo(
             () => {
                 let nextValue = getValue();
 
-                if (!isEqual(value, nextValue)) {
-                    setValue(nextValue);
+                if (!isEqual(value.current, nextValue)) {
+                    value.current = nextValue;
+                    listener();
                 }
 
                 return Abon.composedSubscription(() => {
                     nextValue = getValue();
 
                     if (!isEqual(value, nextValue)) {
-                        setValue(nextValue);
+                        value.current = nextValue;
+                        listener();
                     }
                 }, listen);
             },
@@ -129,15 +132,16 @@ export class Abon<T> {
             deps,
         );
 
-        return value;
+        return value.current as T;
     }
 
     static useComposedValueAsync<T>(
         getValue: () => Promise<T>,
         listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
         deps: readonly any[] = [],
-    ) {
-        const [value, setValue] = React.useState<T>();
+    ): T | undefined {
+        const listener = useForceUpdate();
+        const value = React.useRef<T>();
         const getting = React.useRef<symbol>();
 
         useClearedMemo(
@@ -146,7 +150,8 @@ export class Abon<T> {
 
                 getValue().then((nextValue) => {
                     if (getting.current === gettingMemo && !isEqual(value, nextValue)) {
-                        setValue(nextValue);
+                        value.current = nextValue;
+                        listener();
                     }
                 });
 
@@ -155,7 +160,8 @@ export class Abon<T> {
 
                     getValue().then((nextValue) => {
                         if (getting.current === gettingSubscription && !isEqual(value, nextValue)) {
-                            setValue(nextValue);
+                            value.current = nextValue;
+                            listener();
                         }
                     });
                 }, listen);
@@ -164,7 +170,7 @@ export class Abon<T> {
             deps,
         );
 
-        return value;
+        return value.current;
     }
 
     static resolve<T>(listen: (listener: (value?: T) => void) => UnsubscribeFn): Promise<void>;

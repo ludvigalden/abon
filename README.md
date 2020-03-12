@@ -107,7 +107,7 @@ function DisplayNumbers() {
 Extends `Map` with additional features allowing for setting and modifying values in one sweep. Whenever a value is added, modified or deleted, subscribers are notified. They can also be notified manually using the `notify` method, which accepts a set of keys if only specific keys should be notified.
 
 ```typescript
-import { AbonMap } from "./index";
+import { AbonMap } from "abon";
 
 const userFollowers = new AbonMap<string, number>([["james", 10]]);
 
@@ -143,7 +143,7 @@ function TotalFollowers() {
         0,
     );
 
-    return <p>Followers: {followers || 0}</p>;
+    return <p>Total followers: {totalFollowers || 0}</p>;
 }
 ```
 

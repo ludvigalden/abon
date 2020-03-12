@@ -14,7 +14,7 @@ export class AbonEvent<E, P = undefined> {
     subscribe(...args: any[]): any {
         if (args.length === 3) {
             const [event, payload, listener] = args as [E, P, Listener];
-            return this.notifier.subscribe([event as any], (_payload) => isEqual(payload, _payload) && listener());
+            return this.notifier.subscribe([event as any], (notifiedPayload) => isEqual(payload, notifiedPayload) && listener());
         } else if (args.length === 2) {
             return this.notifier.subscribe([args[0]], args[1]);
         } else {
@@ -27,7 +27,7 @@ export class AbonEvent<E, P = undefined> {
     notify(event: E, payloads: P[]): void;
     notify(event: E, payload?: P | P[]) {
         if (Array.isArray(payload)) {
-            payload.forEach((_payload) => this.notifier.notify([event] as any, _payload));
+            payload.forEach((payloadItem) => this.notifier.notify([event] as any, payloadItem));
             this.notifier.notify([], event);
         } else {
             this.notifier.notify([event] as any, payload);

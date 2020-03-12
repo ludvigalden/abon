@@ -2,7 +2,7 @@ import React from "react";
 
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";
-import { useClearedMemo } from "./utils";
+import { useClearedMemo, useForceUpdate } from "./utils";
 
 export class AbonSet<T> extends Set<T> {
     private readonly $notifier: Notifier<this>;
@@ -40,16 +40,41 @@ export class AbonSet<T> extends Set<T> {
         return false;
     }
 
+    set(values?: Iterable<T>) {
+        let modifiedAny = false;
+
+        const forced = new Set(values);
+
+        Array.from(this.values()).forEach((value) => {
+            if (!forced.has(value)) {
+                super.delete(value);
+                modifiedAny = true;
+            }
+        });
+
+        Array.from(forced.values()).forEach((value) => {
+            if (!super.has(value)) {
+                super.add(value);
+                modifiedAny = true;
+            }
+        });
+
+        if (modifiedAny) {
+            this.notify();
+        }
+
+        return modifiedAny;
+    }
+
     modify(add?: Iterable<T>, remove?: Iterable<T>) {
-        let deletedAny = false;
-        let addedAny = false;
+        let modifiedAny = false;
 
         if (add) {
             Array.from(add).forEach((value) => {
                 if (!this.has(value)) {
                     super.add(value);
 
-                    addedAny = true;
+                    modifiedAny = true;
                 }
             });
         }
@@ -59,18 +84,16 @@ export class AbonSet<T> extends Set<T> {
                 if (this.has(value)) {
                     super.delete(value);
 
-                    deletedAny = true;
+                    modifiedAny = true;
                 }
             });
         }
 
-        if (deletedAny || addedAny) {
+        if (modifiedAny) {
             this.notify();
-
-            return true;
-        } else {
-            return false;
         }
+
+        return modifiedAny;
     }
 
     subscribe(callback: ChangeListener<this>): UnsubscribeFn {
@@ -83,12 +106,12 @@ export class AbonSet<T> extends Set<T> {
     }
 
     use() {
-        const forceUpdate = React.useReducer(() => Object.create(null), undefined)[1];
+        const listener = useForceUpdate();
 
         useClearedMemo(
-            () => this.subscribe(forceUpdate),
+            () => this.subscribe(listener),
             (unsubscribe) => unsubscribe(),
-            [this, forceUpdate],
+            [this, listener],
         );
 
         return this;

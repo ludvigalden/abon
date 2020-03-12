@@ -1,9 +1,8 @@
-import React from "react";
 import isEqual from "lodash.isequal";
 
 import { NotifierDeep, Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";
-import { useClearedMemo } from "./utils";
+import { useClearedMemo, useForceUpdate } from "./utils";
 
 export class AbonMap<K, V> extends Map<K, V> {
     private readonly $notifier: NotifierDeep;
@@ -109,7 +108,7 @@ export class AbonMap<K, V> extends Map<K, V> {
     use(key: K): V | undefined;
     use(): this;
     use(key?: K): V | undefined | this {
-        const listener = React.useReducer(() => Object.create(null), undefined)[1];
+        const listener = useForceUpdate();
 
         useClearedMemo(
             () => (key != null ? this.subscribe(key, listener) : this.subscribe(listener)),

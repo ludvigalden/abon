@@ -25,3 +25,7 @@ export function useClearedMemo<T>(get: () => T, clear: (previousValue: T) => voi
 
     return valueRef.current;
 }
+
+export function useForceUpdate(): () => void {
+    return React.useReducer(() => Object.create(null), undefined)[1] as any;
+}

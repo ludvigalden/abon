@@ -5,7 +5,7 @@ import set from "lodash.set";
 
 import { NotifierDeep } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";
-import { useClearedMemo } from "./utils";
+import { useClearedMemo, useForceUpdate } from "./utils";
 
 export class AbonDeep<T extends object> {
     current: T;
@@ -374,7 +374,7 @@ export class AbonDeep<T extends object> {
         const keys = parseKeyArgs(args);
 
         if (!keys.length) {
-            const listener = React.useReducer(() => Object.create(null), undefined)[1];
+            const listener = useForceUpdate();
 
             useClearedMemo(
                 () => this.subscribe(listener),
@@ -384,15 +384,24 @@ export class AbonDeep<T extends object> {
 
             return this;
         } else {
-            const [value, setValue] = React.useState<any>(() => this.get(keys as any));
+            // const [value, setValue] = React.useState<any>(() => this.get(keys as any));
+            const listener = useForceUpdate();
+            const value = React.useRef<T>();
 
             useClearedMemo(
-                () => this.subscribe(keys as any, setValue),
+                () => {
+                    value.current = this.get(keys as any);
+
+                    return this.subscribe(keys as any, (nextValue) => {
+                        value.current = nextValue;
+                        listener();
+                    });
+                },
                 (unsubscribe) => unsubscribe(),
-                [this, setValue, NotifierDeep.formatNotifierKey(keys)],
+                [this, listener, value, NotifierDeep.formatNotifierKey(keys)],
             );
 
-            return value;
+            return value.current;
         }
     }
 
