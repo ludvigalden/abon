@@ -17,3 +17,7 @@ export interface EventListener<E, P> {
 export interface EventPayloadListener<P> {
     (payload: P): void;
 }
+
+export interface Subscribeable<T> {
+    subscribe(listener: ChangeListener<T>): UnsubscribeFn;
+}

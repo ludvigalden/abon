@@ -5,7 +5,7 @@ import { AbonEvent } from "./abon-event";
 import { AbonMap } from "./abon-map";
 import { AbonSet } from "./abon-set";
 import { Notifier } from "./notifier";
-import { ChangeListener, UnsubscribeFn } from "./types";
+import { ChangeListener, UnsubscribeFn, Subscribeable } from "./types";
 import { useClearedMemo, useForceUpdate } from "./utils";
 import { AbonDeep } from "./abon-deep";
 
@@ -173,15 +173,46 @@ export class Abon<T> {
         return value.current;
     }
 
+    static from<T>(
+        getValue: () => T,
+        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
+        setUnsubscribe: (unsubscribe: UnsubscribeFn) => void,
+    ): Abon<T>;
+    static from<T>(
+        getValue: () => T,
+        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
+        unsubscribeFns: Set<UnsubscribeFn>,
+    ): Abon<T>;
+    static from<T>(
+        getValue: () => T,
+        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
+        unsubscribe: Set<UnsubscribeFn> | ((unsubscribe: UnsubscribeFn) => void),
+    ): Abon<T> {
+        const abon = new Abon(getValue());
+
+        const subscription = Abon.composedSubscription(function() {
+            abon.set(getValue());
+        }, listen);
+
+        if (unsubscribe instanceof Set) {
+            unsubscribe.add(subscription);
+        } else {
+            unsubscribe(subscription);
+        }
+
+        return abon;
+    }
+
     static resolve<T>(listen: (listener: (value?: T) => void) => UnsubscribeFn): Promise<void>;
     static resolve<T>(abon: Abon<T>): Promise<T>;
     static resolve<T extends object>(abon: AbonDeep<T>): Promise<T>;
     static resolve<AM extends AbonMap<any, any>>(map: AM): Promise<AM>;
     static resolve<AS extends AbonSet<any>>(set: AS): Promise<AS>;
+    static resolve<S extends Subscribeable<any>>(subscribable: S): Promise<S extends Subscribeable<infer T> ? T : unknown>;
     static resolve(arg: any): Promise<any> {
         let listen: (listener: (value?: any) => void) => UnsubscribeFn;
 
-        if (arg instanceof Abon || arg instanceof AbonMap || arg instanceof AbonDeep || arg instanceof AbonSet) {
+        if (typeof arg.subscribe === "function") {
             listen = arg.subscribe.bind(arg);
         } else {
             listen = arg;
@@ -190,7 +221,7 @@ export class Abon<T> {
         let setValue: (value?: any) => void;
         let resolveValue: any = INITIAL_VALUE;
 
-        const unsubscribe = listen((value) => {
+        const unsubscribe = listen(function(value) {
             if (typeof unsubscribe === "function") {
                 unsubscribe();
             }
@@ -202,7 +233,7 @@ export class Abon<T> {
             }
         });
 
-        return new Promise((resolve) => {
+        return new Promise(function(resolve) {
             if (resolveValue !== INITIAL_VALUE) {
                 resolve(resolveValue);
             } else {
