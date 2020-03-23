@@ -1,7 +1,7 @@
 import React from "react";
-import isEqual from "lodash.isequal";
-import get from "lodash.get";
-import set from "lodash.set";
+import isEqual from "lodash/isEqual";
+import get from "lodash/get";
+import set from "lodash/set";
 
 import { NotifierDeep } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";

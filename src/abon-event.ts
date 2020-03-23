@@ -1,5 +1,5 @@
 import React from "react";
-import isEqual from "lodash.isequal";
+import isEqual from "lodash/isEqual";
 
 import { Listener, EventListener, EventPayloadListener, UnsubscribeFn } from "./types";
 import { NotifierDeep } from "./notifier";

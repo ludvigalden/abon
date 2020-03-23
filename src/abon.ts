@@ -1,5 +1,5 @@
 import React from "react";
-import isEqual from "lodash.isequal";
+import isEqual from "lodash/isEqual";
 
 import { AbonEvent } from "./abon-event";
 import { AbonMap } from "./abon-map";
