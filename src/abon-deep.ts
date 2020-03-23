@@ -7,6 +7,7 @@ import { NotifierDeep } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";
 import { useClearedMemo, useForceUpdate } from "./utils";
 
+/** Allows for setting, getting, and subscribing to deeply nested values. */
 export class AbonDeep<T extends object> {
     current: T;
 
@@ -119,7 +120,7 @@ export class AbonDeep<T extends object> {
             const preValue = get(this.current, keys);
 
             if (!isEqual(preValue, value)) {
-                set(this.current, args, value);
+                set(this.current, keys, value);
 
                 this.$notifier.notify([], this.current);
 
@@ -372,10 +373,9 @@ export class AbonDeep<T extends object> {
     >(keys: [K1, K2, K3, K4, K5, K6, K7]): T[K1][K2][K3][K4][K5][K6][K7];
     use(...args: any[]): any {
         const keys = parseKeyArgs(args);
+        const listener = useForceUpdate();
 
         if (!keys.length) {
-            const listener = useForceUpdate();
-
             useClearedMemo(
                 () => this.subscribe(listener),
                 (unsubscribe) => unsubscribe(),
@@ -384,8 +384,6 @@ export class AbonDeep<T extends object> {
 
             return this;
         } else {
-            // const [value, setValue] = React.useState<any>(() => this.get(keys as any));
-            const listener = useForceUpdate();
             const value = React.useRef<T>();
 
             useClearedMemo(

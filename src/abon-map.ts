@@ -4,6 +4,7 @@ import { NotifierDeep, Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";
 import { useClearedMemo, useForceUpdate } from "./utils";
 
+/** A subscribeable implementation of a `Map`. */
 export class AbonMap<K, V> extends Map<K, V> {
     private readonly $notifier: NotifierDeep;
 
@@ -19,8 +20,10 @@ export class AbonMap<K, V> extends Map<K, V> {
     }
 
     set(key: K, value: V): this;
+    /** Set the current entries, meaning entries that currently exist but do not exist in the passed `entries` will be deleted. */
+    set(entries: [K, V][]): this;
+    /** Set the current entries, meaning entries that currently exist but do not exist in the passed `record` will be deleted. */
     set(record: Record<K & keyof any, V>): this;
-    set(entities: [K, V][]): this;
     set(...args: any[]) {
         if (args.length === 2) {
             const [key, value] = args;
@@ -77,6 +80,47 @@ export class AbonMap<K, V> extends Map<K, V> {
             });
 
             if (notify.length || notifyDelete) {
+                this.notify(notify);
+            }
+        }
+
+        return this;
+    }
+
+    /** Patch the current entries, meaning entries of the passed `entries` will be created or updated depending if they exist in the current entries. */
+    patch(entries: [K, V][]): this;
+    /** Patch the current entries, meaning entries of the passed `record` will be created or updated depending if they exist in the current entries. */
+    patch(record: K extends keyof any ? Record<K & keyof any, V> : any): this;
+    patch(...args: any[]) {
+        if (Array.isArray(args[0])) {
+            const map = new Map(args[0] as [K, V][]);
+
+            const notify: K[] = [];
+
+            Array.from(map.keys()).forEach((key) => {
+                if (!this.has(key) || !isEqual(map.get(key), this.get(key))) {
+                    super.set(key, map.get(key) as V);
+                    notify.push(key);
+                }
+            });
+
+            if (notify.length) {
+                this.notify(notify);
+            }
+        } else {
+            const record = args[0] as Record<K & keyof any, V>;
+
+            const notify: K[] = [];
+
+            (Object.keys(record) as (K & keyof any)[]).forEach((key) => {
+                if (!this.has(key) || !isEqual(record[key], this.get(key))) {
+                    super.set(key, record[key]);
+
+                    notify.push(key);
+                }
+            });
+
+            if (notify.length) {
                 this.notify(notify);
             }
         }
@@ -142,5 +186,15 @@ export class AbonMap<K, V> extends Map<K, V> {
     clear() {
         super.clear();
         this.notify();
+    }
+
+    get record(): K extends keyof any ? Record<K, V> : any {
+        const record: any = {};
+
+        Array.from(this.entries()).forEach(([key, value]) => {
+            record[key] = value;
+        });
+
+        return record;
     }
 }

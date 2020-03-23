@@ -2,11 +2,12 @@ import React from "react";
 import isEqual from "lodash/isEqual";
 
 import { Listener, EventListener, EventPayloadListener, UnsubscribeFn } from "./types";
-import { NotifierDeep } from "./notifier";
+import { Notifier } from "./notifier";
 import { useClearedMemo } from "./utils";
 
-export class AbonEvent<E, P = undefined> {
-    protected readonly notifier = new NotifierDeep();
+/** Allows for subscribing to and notifying events and payloads. */
+export class AbonEvent<E = undefined, P = undefined> {
+    protected readonly notifier = new Notifier<E>();
 
     subscribe(listener: EventListener<E, P>): UnsubscribeFn;
     subscribe(event: E, listener: EventPayloadListener<P>): UnsubscribeFn;
@@ -14,11 +15,19 @@ export class AbonEvent<E, P = undefined> {
     subscribe(...args: any[]): any {
         if (args.length === 3) {
             const [event, payload, listener] = args as [E, P, Listener];
-            return this.notifier.subscribe([event as any], (notifiedPayload) => isEqual(payload, notifiedPayload) && listener());
+
+            return this.notifier.subscribe(
+                ((notifiedEvent: E, notifiedPayload: P) =>
+                    isEqual(notifiedEvent, event) && isEqual(notifiedPayload, payload) && listener()) as any,
+            );
         } else if (args.length === 2) {
-            return this.notifier.subscribe([args[0]], args[1]);
+            const [event, listener] = args as [E, EventPayloadListener<P>];
+
+            return this.notifier.subscribe(((notifiedEvent: E, payload: P) => isEqual(notifiedEvent, event) && listener(payload)) as any);
         } else {
-            return this.notifier.subscribe([], args[0]);
+            const listener: EventListener<E, P> = args[0];
+
+            return this.notifier.subscribe(listener as any);
         }
     }
 
@@ -27,11 +36,11 @@ export class AbonEvent<E, P = undefined> {
     notify(event: E, payloads: P[]): void;
     notify(event: E, payload?: P | P[]) {
         if (Array.isArray(payload)) {
-            payload.forEach((payloadItem) => this.notifier.notify([event] as any, payloadItem));
-            this.notifier.notify([], event);
+            payload.forEach((payloadItem) => {
+                this.notifier.notify(event, payloadItem);
+            });
         } else {
-            this.notifier.notify([event] as any, payload);
-            this.notifier.notify([], event);
+            this.notifier.notify(event, payload);
         }
     }
 
@@ -54,7 +63,7 @@ export class AbonEvent<E, P = undefined> {
         );
     }
 
-    static use<E, P = undefined>(deps: readonly any[] = []): AbonEvent<E, P> {
+    static use<E = undefined, P = undefined>(deps: readonly any[] = []): AbonEvent<E, P> {
         return React.useMemo(() => new AbonEvent(), deps);
     }
 }

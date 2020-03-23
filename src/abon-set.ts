@@ -19,6 +19,10 @@ export class AbonSet<T> extends Set<T> {
     }
 
     add(value: T) {
+        if (!this.$notifier) {
+            return super.add(value);
+        }
+
         if (!this.has(value)) {
             super.add(value);
 

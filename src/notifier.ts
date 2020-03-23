@@ -11,8 +11,10 @@ export class Notifier<T> extends Set<ChangeListener<T>> {
         this.delete(listener);
     }
 
-    notify(value: T) {
-        Array.from(this.values()).forEach((listener) => listener(value));
+    notify(value: T): this;
+    notify(value: T, ...otherArgs: any[]): this;
+    notify(...args: any[]) {
+        Array.from(this.values()).forEach((listener) => listener(...(args as [T])));
 
         return this;
     }
@@ -62,11 +64,11 @@ export class NotifierDeep extends Map<keyof any, Notifier<any>> {
         };
     }
 
-    notify(keys: (keyof any)[], value: any): this {
+    notify(keys: (keyof any)[], ...args: any[]): this {
         const notifier = this.get(NotifierDeep.formatNotifierKey(keys));
 
         if (notifier) {
-            notifier.notify(value);
+            notifier.notify(...(args as [any]));
         }
 
         return this;
