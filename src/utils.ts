@@ -15,8 +15,10 @@ export function useClearedMemo<T>(get: () => T, clear: (previousValue: T) => voi
     /** Call the `clear` fn on unmount. */
     React.useEffect(
         () => () => {
-            clear(valueRef.current);
-            valueRef.current = INITIAL_VALUE;
+            if (valueRef.current !== INITIAL_VALUE) {
+                clear(valueRef.current);
+                valueRef.current = INITIAL_VALUE;
+            }
         },
         [],
     );
