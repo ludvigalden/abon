@@ -40,6 +40,9 @@
 		"git-reset": "git reset --hard HEAD",
 		"size": "size-limit"
 	},
+	"dependencies": {
+		"lodash-es": "^4.17.15"
+	},
 	"peerDependencies": {
 		"react": ">=16.8.0"
 	},
@@ -79,8 +82,5 @@
 		"tsdx": "^0.12.3",
 		"tslib": "^1.11.1",
 		"typescript": "^3.8.3"
-	},
-	"dependencies": {
-		"lodash": "^4.17.15"
 	}
 }
