@@ -11,6 +11,41 @@ describe("AbonSet", () => {
         expect(set.size).toBe(2);
     });
 
+    it("sets", () => {
+        const set = new AbonSet<number>([0, 1, 2]);
+
+        expect(set.has(0)).toBe(true);
+        expect(set.has(1)).toBe(true);
+        expect(set.has(2)).toBe(true);
+        expect(set.has(3)).toBe(false);
+
+        set.set([0]);
+
+        expect(set.has(0)).toBe(true);
+        expect(set.has(1)).toBe(false);
+    });
+
+    it("modifies", () => {
+        const set = new AbonSet<number>([0, 1]);
+
+        expect(set.has(0)).toBe(true);
+        expect(set.has(1)).toBe(true);
+        expect(set.has(2)).toBe(false);
+
+        set.modify([0], [1]);
+
+        expect(set.has(0)).toBe(true);
+        expect(set.has(1)).toBe(false);
+
+        set.modify(null, [0]);
+
+        expect(set.has(0)).toBe(false);
+
+        set.modify([1]);
+
+        expect(set.has(1)).toBe(true);
+    });
+
     it("notifies", (done) => {
         const promises: Promise<any>[] = [];
 
