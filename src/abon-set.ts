@@ -18,8 +18,11 @@ export class AbonSet<T> extends Set<T> {
         });
     }
 
-    add(value: T) {
-        if (!this.$notifier) {
+    add(value: T): this;
+    /** `Set.add` */
+    add(value: T, silent?: true): this;
+    add(value: T, silent?: true) {
+        if (!this.$notifier || silent) {
             return super.add(value);
         }
 
@@ -32,22 +35,31 @@ export class AbonSet<T> extends Set<T> {
         return this;
     }
 
-    delete(value: T) {
-        if (this.has(value)) {
+    delete(value: T): boolean;
+    /** `Set.delete` */
+    delete(value: T, silent?: true): boolean;
+    delete(value: T, silent?: true) {
+        if (silent) {
+            return super.delete(value);
+        } else if (this.has(value)) {
             const deleted = super.delete(value);
 
             this.notify();
 
             return deleted;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
-    set(values?: Iterable<T>) {
+    /** Ensure that the values of the set has equal content to the passed iterable and notifies if there's a diff. */
+    set(values?: Iterable<T> | null | false): boolean;
+    /** Ensure that the values of the set has equal content to the passed iterable without notifying. */
+    set(values?: Iterable<T> | null | false, silent?: true): boolean;
+    set(values?: Iterable<T> | null | false, silent?: true) {
         let modifiedAny = false;
 
-        const forced = new Set(values);
+        const forced = new Set(values || undefined);
 
         Array.from(this.values()).forEach((value) => {
             if (!forced.has(value)) {
@@ -63,14 +75,18 @@ export class AbonSet<T> extends Set<T> {
             }
         });
 
-        if (modifiedAny) {
+        if (modifiedAny && !silent) {
             this.notify();
         }
 
         return modifiedAny;
     }
 
-    modify(add?: Iterable<T>, remove?: Iterable<T>) {
+    /** Use iterables to add or remove values and notify subscribers if there's a diff. */
+    modify(add?: Iterable<T> | null | false, remove?: Iterable<T> | null | false): boolean;
+    /** Use iterables to add or remove values without notifying subscribers. */
+    modify(add?: Iterable<T> | null | false, remove?: Iterable<T> | null | false, silent?: true): boolean;
+    modify(add?: Iterable<T> | null | false, remove?: Iterable<T> | null | false, silent?: true) {
         let modifiedAny = false;
 
         if (add) {
@@ -93,7 +109,7 @@ export class AbonSet<T> extends Set<T> {
             });
         }
 
-        if (modifiedAny) {
+        if (modifiedAny && !silent) {
             this.notify();
         }
 
@@ -104,9 +120,15 @@ export class AbonSet<T> extends Set<T> {
         return this.$notifier.subscribe(callback);
     }
 
-    clear() {
+    clear(): void;
+    /** `Set.clear` */
+    clear(silent?: true): void;
+    clear(silent?: true) {
         super.clear();
-        this.$notifier.notify(this);
+
+        if (!silent) {
+            this.$notifier.notify(this);
+        }
     }
 
     use() {
