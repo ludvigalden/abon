@@ -92,7 +92,7 @@ export class AbonDeep<T extends object> {
         K7 extends keyof T[K1][K2][K3][K4][K5][K6]
     >(keys: [K1, K2, K3, K4, K5, K6, K7], value: T[K1][K2][K3][K4][K5][K6][K7]): this;
     set(...args: any[]) {
-        const { keys, value } = parseKeyValueArgs(args);
+        const { keys, value } = AbonDeep.parseKeyValueArgs(args);
 
         if (!keys.length) {
             if (!isEqual(value, this.current)) {
@@ -101,7 +101,7 @@ export class AbonDeep<T extends object> {
 
                 Array.from(this.$notifier.keys()).forEach((notifierKey) => {
                     if (notifierKey === NotifierDeep.notifierKeyDivider) {
-                        this.$notifier.notify([], this.current);
+                        this.notify([], this.current);
                     } else {
                         const keys = NotifierDeep.parseNotifierKey(notifierKey);
 
@@ -109,7 +109,7 @@ export class AbonDeep<T extends object> {
                         const valueNext = get(value, keys);
 
                         if (!isEqual(valueBefore, valueNext)) {
-                            this.$notifier.notify(keys, valueNext);
+                            this.notify(keys, valueNext);
                         }
                     }
                 });
@@ -122,12 +122,12 @@ export class AbonDeep<T extends object> {
             if (!isEqual(preValue, value)) {
                 set(this.current, keys, value);
 
-                this.$notifier.notify([], this.current);
+                this.notify([], this.current);
 
                 keys.forEach((_, i) => {
                     const notifyKeys = keys.slice(0, i + 1);
 
-                    this.$notifier.notify(notifyKeys as any, get(this.current, notifyKeys as any));
+                    this.notify(notifyKeys as any, get(this.current, notifyKeys as any));
                 });
 
                 const notifierKey = NotifierDeep.formatNotifierKey(args);
@@ -142,7 +142,7 @@ export class AbonDeep<T extends object> {
                     const valueChildKeys = NotifierDeep.parseNotifierKey(anyNotifierKey).slice(keys.length);
 
                     if (!isEqual(get(preValue, valueChildKeys), get(value, valueChildKeys))) {
-                        this.$notifier.notify([...keys, ...valueChildKeys], get(value, valueChildKeys));
+                        this.notify([...keys, ...valueChildKeys], get(value, valueChildKeys));
                     }
                 });
             }
@@ -217,7 +217,7 @@ export class AbonDeep<T extends object> {
         K7 extends keyof T[K1][K2][K3][K4][K5][K6]
     >(keys: [K1, K2, K3, K4, K5, K6, K7]): T[K1][K2][K3][K4][K5][K6][K7];
     get(...args: any[]): any {
-        const keys = parseKeyArgs(args);
+        const keys = AbonDeep.parseKeyArgs(args);
 
         if (!keys.length) {
             return this.current;
@@ -302,7 +302,7 @@ export class AbonDeep<T extends object> {
         K7 extends keyof T[K1][K2][K3][K4][K5][K6]
     >(keys: [K1, K2, K3, K4, K5, K6, K7], listener: ChangeListener<T[K1][K2][K3][K4][K5][K6][K7]>): UnsubscribeFn;
     subscribe(...args: any[]) {
-        const { keys, value } = parseKeyValueArgs(args);
+        const { keys, value } = AbonDeep.parseKeyValueArgs(args);
         return this.$notifier.subscribe(keys, value);
     }
 
@@ -372,7 +372,7 @@ export class AbonDeep<T extends object> {
         K7 extends keyof T[K1][K2][K3][K4][K5][K6]
     >(keys: [K1, K2, K3, K4, K5, K6, K7]): T[K1][K2][K3][K4][K5][K6][K7];
     use(...args: any[]): any {
-        const keys = parseKeyArgs(args);
+        const keys = AbonDeep.parseKeyArgs(args);
         const listener = useForceUpdate();
 
         if (!keys.length) {
@@ -479,7 +479,7 @@ export class AbonDeep<T extends object> {
         K7 extends keyof T[K1][K2][K3][K4][K5][K6]
     >(keys: [K1, K2, K3, K4, K5, K6, K7], listener: ChangeListener<T[K1][K2][K3][K4][K5][K6][K7]>): this;
     useSubscription(...args: any[]) {
-        const { keys, value } = parseKeyValueArgs(args);
+        const { keys, value } = AbonDeep.parseKeyValueArgs(args);
 
         useClearedMemo(
             () => this.subscribe(keys as any, value),
@@ -490,33 +490,41 @@ export class AbonDeep<T extends object> {
         return this;
     }
 
-    notify() {
-        Array.from(this.$notifier.keys()).forEach((notifierKey) => {
-            if (notifierKey === NotifierDeep.notifierKeyDivider) {
-                this.$notifier.notify([], this.current);
-            } else {
-                const keys = NotifierDeep.parseNotifierKey(notifierKey) as any;
-                this.$notifier.notify(keys, this.get(keys));
-            }
-        });
-    }
-}
+    notify(): this;
+    notify(keys: (keyof any)[], ...args: any[]): this;
+    notify(keys?: (keyof any)[], ...args: any[]) {
+        if (keys) {
+            this.$notifier.notify(keys, ...args);
+        } else {
+            Array.from(this.$notifier.keys()).forEach((notifierKey) => {
+                if (notifierKey === NotifierDeep.notifierKeyDivider) {
+                    this.$notifier.notify([], this.current);
+                } else {
+                    const keys = NotifierDeep.parseNotifierKey(notifierKey) as any;
+                    this.$notifier.notify(keys, this.get(keys));
+                }
+            });
+        }
 
-function parseKeyValueArgs(args: any[]): { keys: (keyof any)[]; value: any } {
-    if (args.length === 1) {
-        return { keys: [], value: args[0] };
-    } else if (args.length === 2 && Array.isArray(args[0])) {
-        return { keys: args[0], value: args[1] };
-    } else {
-        const value = args.pop();
-        return { keys: args, value };
+        return this;
     }
-}
 
-function parseKeyArgs(args: any[]): (keyof any)[] {
-    if (args.length === 1 && Array.isArray(args[0])) {
-        return args[0];
-    } else {
-        return args;
+    static parseKeyValueArgs<T = any>(args: any[]): { keys: (keyof T)[]; value: any } {
+        if (args.length === 1) {
+            return { keys: [], value: args[0] };
+        } else if (args.length === 2 && Array.isArray(args[0])) {
+            return { keys: args[0], value: args[1] };
+        } else {
+            const value = args.pop();
+            return { keys: args, value };
+        }
+    }
+
+    static parseKeyArgs<T = any>(args: any[]): (keyof T)[] {
+        if (args.length === 1 && Array.isArray(args[0])) {
+            return args[0];
+        } else {
+            return args;
+        }
     }
 }

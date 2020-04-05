@@ -18,6 +18,14 @@ export interface EventPayloadListener<P> {
     (payload: P): void;
 }
 
+export interface ItemsChangeListener<T extends object, I extends keyof T> {
+    (current: ItemRecord<T, I>, items: T[], ids: T[I][]): any;
+}
+
+export type ItemRecordKey<T extends object, I extends keyof T> = T[I] & (string | number | symbol);
+
+export type ItemRecord<T extends object, I extends keyof T> = Record<ItemRecordKey<T, I>, T>;
+
 export interface Subscribeable<T> {
     subscribe(listener: ChangeListener<T>): UnsubscribeFn;
 }

@@ -1,11 +1,12 @@
 import React from "react";
 import isEqual from "lodash/isEqual";
 
+import { AbonDeep } from "./abon-deep";
 import { AbonEvent } from "./abon-event";
+import { AbonItems } from "./abon-items";
 import { AbonMap } from "./abon-map";
 import { AbonSet } from "./abon-set";
 import { Notifier } from "./notifier";
-import { AbonDeep } from "./abon-deep";
 import { ChangeListener, UnsubscribeFn, Subscribeable } from "./types";
 import { useClearedMemo, useForceUpdate } from "./utils";
 
@@ -283,6 +284,7 @@ export class Abon<T> {
 
     static Deep = AbonDeep;
     static Event = AbonEvent;
+    static Items = AbonItems;
     static Map = AbonMap;
     static Set = AbonSet;
 }

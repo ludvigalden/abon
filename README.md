@@ -147,6 +147,35 @@ function TotalFollowers() {
 }
 ```
 
+## `AbonItems`
+
+Allows for dynamically setting, pushing, unshifting, and subscribing to identified values ("items").
+
+```typescript
+import { AbonItems } from "abon";
+
+const items = new AbonItems<{ itemId: number; name: string; }, "itemId">("itemId", [{ itemId: 5, name: "Jason" }]);
+
+items.push({ itemId: 2, name: "Luke" })
+// items.ids.current: [5, 2]
+items.unshift({ itemId: 3, name: "Marie" })
+// items.ids.current: [3, 5, 2]
+items.set([{ itemId: 7, name: "Mason" }, { itemId: 1, name: "Chlorine" }])
+// items.ids.current: [7, 1]
+items.delete(7)
+// items.ids.current: [1]
+// items.items: [{ itemId: 1, name: "Chlorine" }]
+// items.current: { 1: { itemId: 1, name: "Chlorine" } }
+items.set(5, "name", "Jake")
+// does not make difference because an item where `itemId === 5` does not exist
+items.set(7, "name", "Charlotte")
+// items.items: [{ itemId: 7, name: "Charlotte" }]
+
+items.subscribe((current, items, ids) => {
+    // items equal ids.map(id => current[id])
+})
+```
+
 ## Utility
 
 The `Abon` class provides some static utility for composing and constructing the instances described above.
