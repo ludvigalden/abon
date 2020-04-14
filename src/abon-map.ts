@@ -6,17 +6,10 @@ import { useClearedMemo, useForceUpdate } from "./utils";
 
 /** A subscribeable implementation of a `Map`. */
 export class AbonMap<K, V> extends Map<K, V> {
-    private readonly $notifier: NotifierDeep;
-
     constructor(initial?: readonly (readonly [K, V])[] | null) {
         super(initial);
 
-        Object.defineProperty(this, "$notifier", {
-            value: new NotifierDeep(),
-            configurable: false,
-            writable: false,
-            enumerable: false,
-        });
+        NotifierDeep.define(this);
     }
 
     set(key: K, value: V): this;
@@ -143,9 +136,9 @@ export class AbonMap<K, V> extends Map<K, V> {
     subscribe(callback: ChangeListener<this>): UnsubscribeFn;
     subscribe(...args: any[]) {
         if (args.length === 1) {
-            return this.$notifier.subscribe([], args[0]);
+            return NotifierDeep.get(this).subscribe([], args[0]);
         } else {
-            return this.$notifier.subscribe([args[0]], args[1]);
+            return NotifierDeep.get(this).subscribe([args[0]], args[1]);
         }
     }
 
@@ -168,8 +161,8 @@ export class AbonMap<K, V> extends Map<K, V> {
     }
 
     notify(keys?: K[]) {
-        if (this.$notifier.has(NotifierDeep.notifierKeyDivider)) {
-            (this.$notifier.get(NotifierDeep.notifierKeyDivider) as Notifier<this>).notify(this);
+        if (NotifierDeep.get(this).has(NotifierDeep.notifierKeyDivider)) {
+            (NotifierDeep.get(this).get(NotifierDeep.notifierKeyDivider) as Notifier<this>).notify(this);
         }
 
         Array.from(this.keys()).forEach((key) => {
@@ -177,8 +170,8 @@ export class AbonMap<K, V> extends Map<K, V> {
                 return;
             }
 
-            if (this.$notifier.has(key as any)) {
-                (this.$notifier.get(key as any) as Notifier<V>).notify(this.get(key) as V);
+            if (NotifierDeep.get(this).has(key as any)) {
+                (NotifierDeep.get(this).get(key as any) as Notifier<V>).notify(this.get(key) as V);
             }
         });
     }

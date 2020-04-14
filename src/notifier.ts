@@ -18,6 +18,21 @@ export class Notifier<T> extends Set<ChangeListener<T>> {
 
         return this;
     }
+
+    static get<T>(abon: any): Notifier<T> {
+        return (abon as any).$notifier;
+    }
+
+    static define<T>(abon: T): T {
+        Object.defineProperty(abon, "$notifier", {
+            value: new Notifier(),
+            configurable: false,
+            writable: false,
+            enumerable: false,
+        });
+
+        return abon;
+    }
 }
 
 const NOTIFIER_KEY_DIVIDER = "/:/";
@@ -80,5 +95,20 @@ export class NotifierDeep extends Map<keyof any, Notifier<any>> {
         });
 
         super.clear();
+    }
+
+    static get(abon: any): NotifierDeep {
+        return (abon as any).$notifier;
+    }
+
+    static define<T>(abon: T): T {
+        Object.defineProperty(abon, "$notifier", {
+            value: new NotifierDeep(),
+            configurable: false,
+            writable: false,
+            enumerable: false,
+        });
+
+        return abon;
     }
 }

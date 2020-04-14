@@ -5,24 +5,17 @@ import { ChangeListener, UnsubscribeFn } from "./types";
 import { useClearedMemo, useForceUpdate } from "./utils";
 
 export class AbonSet<T> extends Set<T> {
-    private readonly $notifier: Notifier<this>;
-
     constructor(initial?: Iterable<T>) {
         super(initial);
 
-        Object.defineProperty(this, "$notifier", {
-            value: new Notifier(),
-            configurable: false,
-            writable: false,
-            enumerable: false,
-        });
+        Notifier.define(this);
     }
 
     add(value: T): this;
     /** `Set.add` */
     add(value: T, silent?: true): this;
     add(value: T, silent?: true) {
-        if (!this.$notifier || silent) {
+        if (!Notifier.get(this) || silent) {
             return super.add(value);
         }
 
@@ -117,7 +110,7 @@ export class AbonSet<T> extends Set<T> {
     }
 
     subscribe(callback: ChangeListener<this>): UnsubscribeFn {
-        return this.$notifier.subscribe(callback);
+        return Notifier.get<this>(this).subscribe(callback);
     }
 
     clear(): void;
@@ -127,7 +120,7 @@ export class AbonSet<T> extends Set<T> {
         super.clear();
 
         if (!silent) {
-            this.$notifier.notify(this);
+            Notifier.get<this>(this).notify(this);
         }
     }
 
@@ -144,7 +137,7 @@ export class AbonSet<T> extends Set<T> {
     }
 
     notify() {
-        this.$notifier.notify(this);
+        Notifier.get<this>(this).notify(this);
     }
 
     static use<T>(initial?: () => Iterable<T>, deps: readonly any[] = []): AbonSet<T> {

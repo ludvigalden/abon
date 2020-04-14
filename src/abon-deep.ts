@@ -11,17 +11,10 @@ import { useClearedMemo, useForceUpdate } from "./utils";
 export class AbonDeep<T extends object> {
     current: T;
 
-    private readonly $notifier: NotifierDeep;
-
     constructor(initial?: T) {
         this.current = (initial || {}) as T;
 
-        Object.defineProperty(this, "$notifier", {
-            value: new NotifierDeep(),
-            configurable: false,
-            writable: false,
-            enumerable: false,
-        });
+        NotifierDeep.define(this);
     }
 
     set(value: T): this;
@@ -99,7 +92,7 @@ export class AbonDeep<T extends object> {
                 const before = this.current;
                 this.current = value;
 
-                Array.from(this.$notifier.keys()).forEach((notifierKey) => {
+                Array.from(NotifierDeep.get(this).keys()).forEach((notifierKey) => {
                     if (notifierKey === NotifierDeep.notifierKeyDivider) {
                         this.notify([], this.current);
                     } else {
@@ -132,7 +125,7 @@ export class AbonDeep<T extends object> {
 
                 const notifierKey = NotifierDeep.formatNotifierKey(args);
 
-                Array.from(this.$notifier.keys()).forEach((_anyNotifierKey) => {
+                Array.from(NotifierDeep.get(this).keys()).forEach((_anyNotifierKey) => {
                     const anyNotifierKey = String(_anyNotifierKey);
 
                     if (anyNotifierKey.length <= notifierKey.length || anyNotifierKey.substr(0, notifierKey.length) !== notifierKey) {
@@ -303,7 +296,7 @@ export class AbonDeep<T extends object> {
     >(keys: [K1, K2, K3, K4, K5, K6, K7], listener: ChangeListener<T[K1][K2][K3][K4][K5][K6][K7]>): UnsubscribeFn;
     subscribe(...args: any[]) {
         const { keys, value } = AbonDeep.parseKeyValueArgs(args);
-        return this.$notifier.subscribe(keys, value);
+        return NotifierDeep.get(this).subscribe(keys, value);
     }
 
     use(): this;
@@ -494,14 +487,14 @@ export class AbonDeep<T extends object> {
     notify(keys: (keyof any)[], ...args: any[]): this;
     notify(keys?: (keyof any)[], ...args: any[]) {
         if (keys) {
-            this.$notifier.notify(keys, ...args);
+            NotifierDeep.get(this).notify(keys, ...args);
         } else {
-            Array.from(this.$notifier.keys()).forEach((notifierKey) => {
+            Array.from(NotifierDeep.get(this).keys()).forEach((notifierKey) => {
                 if (notifierKey === NotifierDeep.notifierKeyDivider) {
-                    this.$notifier.notify([], this.current);
+                    NotifierDeep.get(this).notify([], this.current);
                 } else {
                     const keys = NotifierDeep.parseNotifierKey(notifierKey) as any;
-                    this.$notifier.notify(keys, this.get(keys));
+                    NotifierDeep.get(this).notify(keys, this.get(keys));
                 }
             });
         }

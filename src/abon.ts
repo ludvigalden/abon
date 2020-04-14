@@ -13,30 +13,23 @@ import { useClearedMemo, useForceUpdate } from "./utils";
 export class Abon<T> {
     current: T;
 
-    private readonly $notifier: Notifier<T>;
-
     constructor(initial?: T) {
         this.current = initial as T;
 
-        Object.defineProperty(this, "$notifier", {
-            value: new Notifier(),
-            configurable: false,
-            writable: false,
-            enumerable: false,
-        });
+        Notifier.define(this);
     }
 
     set(value: T) {
         if (!isEqual(this.current, value)) {
             this.current = value;
-            this.$notifier.notify(value);
+            Notifier.get(this).notify(value);
         }
 
         return this;
     }
 
     subscribe(listener: ChangeListener<T>): UnsubscribeFn {
-        return this.$notifier.subscribe(listener);
+        return Notifier.get<T>(this).subscribe(listener);
     }
 
     use() {
@@ -60,7 +53,7 @@ export class Abon<T> {
     }
 
     notify() {
-        this.$notifier.notify(this.current);
+        Notifier.get(this).notify(this.current);
     }
 
     static use<T>(initial?: () => T, deps: readonly any[] = []): Abon<T> {
