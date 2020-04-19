@@ -1,10 +1,12 @@
 import isEqual from "lodash/isEqual";
+import uniqBy from "lodash/uniqBy";
 
 import { AbonDeep } from "./abon-deep";
 import { ChangeListener, UnsubscribeFn, ItemRecord, ItemRecordKey, ItemsChangeListener } from "./types";
 import { Abon } from "./abon";
 
-export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<ItemRecord<T, I>> {
+export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<ItemRecord<T, I>>
+    implements Pick<Array<T>, "find" | "findIndex" | "pop" | "values"> {
     ids: Abon<T[I][]>;
 
     constructor(readonly idKey: I, initial?: T[]) {
@@ -36,7 +38,7 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
 
                 super.set(current);
             } else {
-                const items: T[] = value;
+                let items: T[] = value;
 
                 if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
                     const invalidItemIndex = items.findIndex((item) => !item || item[this.idKey] == null);
@@ -50,6 +52,8 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
                         );
                     }
                 }
+
+                items = uniqBy(items, (item) => item[this.idKey]);
 
                 const ids: T[I][] = items.map((item) => item[this.idKey]);
                 const current = AbonItems.record(items, this.idKey);
@@ -76,18 +80,18 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
     }
 
     delete(...ids: T[I][]) {
-        return this.set(this.items.filter((item) => !item || !ids.includes(item[this.idKey])));
+        return this.set(this.array.filter((item) => !item || !ids.includes(item[this.idKey])));
     }
 
-    push(...items: T[]): this {
+    push(...items: T[]): number {
         if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-            const undefinedItemIndex = this.items.findIndex((item) => !item || item[this.idKey] == null);
+            const undefinedItemIndex = this.array.findIndex((item) => !item || item[this.idKey] == null);
 
             if (undefinedItemIndex >= 0) {
                 throw new Error(
                     `An invalid item exists at at index ${undefinedItemIndex} (mismatch between ids and defined items). Was AbonItems.current or AbonItems.ids mutated incorrectly?` +
                         "\n\titems: [" +
-                        this.items.map((item) => (!item || item[this.idKey] == null ? "null" : String(item[this.idKey]))).join(", ") +
+                        this.array.map((item) => (!item || item[this.idKey] == null ? "null" : String(item[this.idKey]))).join(", ") +
                         `]\n\tcurrent: {` +
                         Object.keys(this.current)
                             .map((id) => ` ${id}: {...} `)
@@ -96,6 +100,8 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
                 );
             }
         }
+
+        items = uniqBy(items, (item) => item[this.idKey]);
 
         const pushedIds = items.map((item) => item[this.idKey]);
 
@@ -106,7 +112,42 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
                 .concat(...items),
         );
 
-        return this;
+        return this.length;
+    }
+
+    unshift(...items: T[]): number {
+        if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
+            const undefinedItemIndex = this.array.findIndex((item) => !item || item[this.idKey] == null);
+
+            if (undefinedItemIndex >= 0) {
+                throw new Error(
+                    `An invalid item exists at at index ${undefinedItemIndex} (mismatch between ids and defined items). Was AbonItems.current or AbonItems.ids mutated incorrectly?` +
+                        "\n\titems: [" +
+                        this.array.map((item) => (!item || item[this.idKey] == null ? "null" : String(item[this.idKey]))).join(", ") +
+                        `]\n\tcurrent: {` +
+                        Object.keys(this.current)
+                            .map((id) => ` ${id}: {...} `)
+                            .join(",") +
+                        `}\n\tids: [${this.ids.current.join(", ")}]`,
+                );
+            }
+        }
+
+        items = uniqBy(items, (item) => item[this.idKey]);
+
+        const unshiftedIds = items.map((item) => item[this.idKey]);
+
+        this.set(
+            items.concat(
+                ...this.ids.current.filter((id) => !unshiftedIds.includes(id)).map((id) => this.current[id as ItemRecordKey<T, I>]),
+            ),
+        );
+
+        return this.length;
+    }
+
+    has(id: T[I]) {
+        return Boolean(this.current[id as ItemRecordKey<T, I>]);
     }
 
     subscribe(listener: ItemsChangeListener<T, I>): UnsubscribeFn;
@@ -202,23 +243,11 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
         return super.subscribe(...(args as [any]));
     }
 
-    unshift(...items: T[]): this {
-        const unshiftedIds = items.map((item) => item[this.idKey]);
-
-        this.set(
-            items.concat(
-                ...this.ids.current.filter((id) => !unshiftedIds.includes(id)).map((id) => this.current[id as ItemRecordKey<T, I>]),
-            ),
-        );
-
-        return this;
-    }
-
     notify(): this;
     notify(keys: (keyof any)[], ...args: any[]): this;
     notify(keys?: (keyof any)[], ...args: any[]) {
         if (keys && !keys.length && args.length === 1) {
-            super.notify(keys, args[0], this.items, this.ids.current);
+            super.notify(keys, args[0], this.array, this.ids.current);
         } else {
             super.notify(keys as any, ...args);
         }
@@ -226,8 +255,46 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
         return this;
     }
 
-    get items() {
-        return this.ids.current.map((id): T => this.current[id as never]);
+    find<S extends T>(predicate: (this: void, value: T, index: number, obj: T[]) => value is S, thisArg?: any): S | undefined;
+    find(predicate: (value: T, index: number, obj: T[]) => unknown, thisArg?: any): T | undefined;
+    find(...args: any[]): any {
+        return this.array.find(...(args as [any]));
+    }
+
+    findIndex(predicate: (value: T, index: number, obj: T[]) => unknown, thisArg?: any): number;
+    findIndex(...args: any[]): any {
+        return this.array.findIndex(...(args as [any]));
+    }
+
+    /** Remove the last item */
+    pop(): T | undefined {
+        const pop = this.ids.current[this.ids.current.length - 1];
+
+        if (pop != null) {
+            const value = this.get(pop as ItemRecordKey<T, I>);
+            this.delete(pop);
+            return value;
+        } else {
+            return undefined;
+        }
+    }
+
+    /** Reverse the items */
+    reverse(): this {
+        this.set(this.array.reverse());
+        return this;
+    }
+
+    values(): IterableIterator<T> {
+        return this.array.values();
+    }
+
+    [Symbol.iterator](): IterableIterator<T> {
+        return this.array[Symbol.iterator]();
+    }
+
+    get array() {
+        return this.ids.current.map((id): T => this.current[id as ItemRecordKey<T, I>]);
     }
 
     get length() {

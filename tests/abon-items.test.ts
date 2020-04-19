@@ -18,6 +18,16 @@ describe("AbonItems", () => {
         expect(items.ids.current.includes(5)).toBe(true);
     });
 
+    it("unshift", () => {
+        const items = new AbonItems<Item, "id">("id");
+
+        items.set([{ id: 0 }, { id: 5 }]);
+        items.unshift({ id: 1 }, { id: 2 });
+
+        expect(items.ids.current[1] === 2).toBe(true);
+        expect(items.ids.current[0] === 1).toBe(true);
+    });
+
     it("id location", () => {
         const items = new AbonItems<Item, "id">("id");
 
