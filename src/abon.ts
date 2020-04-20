@@ -1,6 +1,7 @@
 import React from "react";
 import isEqual from "lodash/isEqual";
 
+import { AbonArray } from "./abon-array";
 import { AbonDeep } from "./abon-deep";
 import { AbonEvent } from "./abon-event";
 import { AbonItems } from "./abon-items";
@@ -170,17 +171,17 @@ export class Abon<T> {
     static from<T>(
         getValue: () => T,
         listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
-        setUnsubscribe: (unsubscribe: UnsubscribeFn) => void,
+        setUnsubscribe?: (unsubscribe: UnsubscribeFn) => void,
     ): Abon<T>;
     static from<T>(
         getValue: () => T,
         listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
-        unsubscribeFns: Set<Function>,
+        unsubscribeFns?: Set<Function>,
     ): Abon<T>;
     static from<T>(
         getValue: () => T,
         listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
-        unsubscribeFns: Set<Function>,
+        unsubscribeFns?: Set<Function>,
     ): Abon<T>;
     static from<T>(
         getValue: () => T,
@@ -275,6 +276,7 @@ export class Abon<T> {
         };
     }
 
+    static Array = AbonArray;
     static Deep = AbonDeep;
     static Event = AbonEvent;
     static Items = AbonItems;

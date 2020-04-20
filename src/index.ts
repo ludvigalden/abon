@@ -1,3 +1,4 @@
+export * from "./abon-array";
 export * from "./abon-deep";
 export * from "./abon-event";
 export * from "./abon-items";
