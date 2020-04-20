@@ -1,9 +1,9 @@
 import isEqual from "lodash/isEqual";
 import uniqBy from "lodash/uniqBy";
 
+import { AbonArray } from "./abon-array";
 import { AbonDeep } from "./abon-deep";
 import { ChangeListener, UnsubscribeFn, ItemRecord, ItemRecordKey, ItemsChangeListener } from "./types";
-import { Abon } from "./abon";
 
 export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<ItemRecord<T, I>>
     implements
@@ -23,12 +23,12 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
             | "includes"
             | "length"
         > {
-    ids: Abon<T[I][]>;
+    ids: AbonArray<T[I]>;
 
     constructor(readonly idKey: I, initial?: T[]) {
         super(AbonItems.record(initial || [], idKey));
 
-        this.ids = new Abon(AbonItems.ids(initial || [], idKey));
+        this.ids = new AbonArray(AbonItems.ids(initial || [], idKey));
     }
 
     /** Set the items */
