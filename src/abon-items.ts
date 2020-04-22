@@ -120,9 +120,9 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
                 let current: ItemRecord<T, I> = value;
 
                 (Object.keys(current) as ItemRecordKey<T, I>[]).forEach((id) => {
-                    if (!this.ids.current.includes(id)) {
-                        if (current === args[0]) {
-                            current = { ...args[0] };
+                    if (!this.ids.includes(id)) {
+                        if (current === value) {
+                            current = { ...value };
                         }
 
                         delete current[id];
@@ -212,7 +212,7 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
         const pushedIds = items.map((item) => item[this.idKey]);
 
         this.set(
-            this.ids.current
+            this.ids
                 .filter((id) => !pushedIds.includes(id))
                 .map((id) => this.current[id as ItemRecordKey<T, I>])
                 .concat(...items),
@@ -247,11 +247,7 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
 
         const unshiftedIds = items.map((item) => item[this.idKey]);
 
-        this.set(
-            items.concat(
-                ...this.ids.current.filter((id) => !unshiftedIds.includes(id)).map((id) => this.current[id as ItemRecordKey<T, I>]),
-            ),
-        );
+        this.set(items.concat(...this.ids.filter((id) => !unshiftedIds.includes(id)).map((id) => this.current[id as ItemRecordKey<T, I>])));
 
         return this.length;
     }
@@ -277,7 +273,7 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
     includes(id: T[I]): boolean;
     includes(thunk: T | T[I]): boolean {
         const id = thunk && typeof thunk === "object" ? (thunk as T)[this.idKey] : thunk;
-        return this.ids.current.includes(id);
+        return this.ids.includes(id);
     }
 
     /**
@@ -301,7 +297,7 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
     indexOf(thunk: T | T[I], fromIndex?: number): number;
     indexOf(thunk: T | T[I], fromIndex?: number): number {
         const id = thunk && typeof thunk === "object" ? (thunk as T)[this.idKey] : thunk;
-        return this.ids.current.indexOf(id, fromIndex);
+        return this.ids.indexOf(id, fromIndex);
     }
 
     /**
@@ -371,7 +367,7 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
 
     /** Removes the last item and returns it. */
     pop(): T | undefined {
-        const pop = this.ids.current[this.ids.current.length - 1];
+        const pop = this.ids[this.ids.current.length - 1];
 
         if (pop != null) {
             const value = this.get(pop as ItemRecordKey<T, I>);
@@ -399,11 +395,11 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
 
     /** The values of the set items in the same order as the `ids` */
     get array() {
-        return this.ids.current.map((id): T => this.current[id as ItemRecordKey<T, I>]);
+        return this.ids.map((id): T => this.current[id as ItemRecordKey<T, I>]);
     }
 
     get length() {
-        return this.ids.current.length;
+        return this.ids.length;
     }
 
     subscribe(listener: ItemsChangeListener<T, I>): UnsubscribeFn;

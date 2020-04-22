@@ -123,7 +123,7 @@ export class AbonDeep<T extends object> {
                     this.notify(notifyKeys as any, get(this.current, notifyKeys as any));
                 });
 
-                const notifierKey = NotifierDeep.formatNotifierKey(args);
+                const notifierKey = NotifierDeep.formatNotifierKey(keys);
 
                 Array.from(NotifierDeep.get(this).keys()).forEach((_anyNotifierKey) => {
                     const anyNotifierKey = String(_anyNotifierKey);
