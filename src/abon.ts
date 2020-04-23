@@ -57,6 +57,10 @@ export class Abon<T> {
         Notifier.get(this).notify(this.current);
     }
 
+    get readonly(): ReadonlyAbon<T> {
+        return this;
+    }
+
     static use<T>(initial?: () => T, deps: readonly any[] = []): Abon<T> {
         return Abon.useRef(initial, deps).use();
     }
@@ -168,6 +172,14 @@ export class Abon<T> {
         return value.current;
     }
 
+    /**
+     * Creates an `Abon` based on a value that should be updated given a selection of subscriptions.
+     *
+     * If the instance should be read-only, you can define the instance as:
+     * ```
+     * const abon = Abon.from(...).readonly;
+     * abon.set(...) // TypeError: Property 'set' does not exist on type 'ReadonlyAbon'
+     * ``` */
     static from<T>(
         getValue: () => T,
         listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
@@ -285,3 +297,7 @@ export class Abon<T> {
 }
 
 const INITIAL_VALUE = Symbol("INITIAL");
+
+interface ReadonlyAbon<T> extends Omit<Abon<T>, "set" | "notify" | "readonly" | "use"> {
+    use(): ReadonlyAbon<T>;
+}

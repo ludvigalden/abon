@@ -579,6 +579,10 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
         return this;
     }
 
+    get readonly(): ReadonlyAbonItems<T, I> {
+        return this;
+    }
+
     static record<T extends object, I extends keyof T>(items: T[], idKey: I) {
         const record: ItemRecord<T, I> = {} as any;
 
@@ -592,4 +596,105 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
     static ids<T extends object, I extends keyof T>(items: T[], idKey: I) {
         return items.map((item) => (!item ? item : item[idKey]));
     }
+}
+
+interface ReadonlyAbonItems<T extends object, I extends keyof T>
+    extends Omit<
+        AbonItems<T, I>,
+        "set" | "notify" | "readonly" | "pop" | "push" | "unshift" | "set" | "delete" | "ids" | "current" | "notify" | "use" | "reverse"
+    > {
+    ids: AbonArray<T[I]>["readonly"];
+    readonly current: ItemRecord<T, I>;
+    use(): ReadonlyAbonItems<T, I>;
+    use(keys: []): ReadonlyAbonItems<T, I>;
+    use<K extends keyof T>(key: K): T[K];
+    use<K extends keyof T>(keys: [K]): T[K];
+    use<K1 extends keyof T, K2 extends keyof T[K1]>(_1: K1, _2: K2): T[K1][K2];
+    use<K1 extends keyof T, K2 extends keyof T[K1]>(keys: [K1, K2]): T[K1][K2];
+    use<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2]>(_1: K1, _2: K2, _3: K3): T[K1][K2][K3];
+    use<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2]>(keys: [K1, K2, K3]): T[K1][K2][K3];
+    use<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2], K4 extends keyof T[K1][K2][K3]>(
+        _1: K1,
+        _2: K2,
+        _3: K3,
+        _4: K4,
+    ): T[K1][K2][K3][K4];
+    use<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2], K4 extends keyof T[K1][K2][K3]>(
+        keys: [K1, K2, K3, K4],
+    ): T[K1][K2][K3][K4];
+    use<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4]
+    >(
+        _1: K1,
+        _2: K2,
+        _3: K3,
+        _4: K4,
+        _5: K5,
+    ): T[K1][K2][K3][K4][K5];
+    use<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4]
+    >(
+        keys: [K1, K2, K3, K4, K5],
+    ): T[K1][K2][K3][K4][K5];
+    use<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4],
+        K6 extends keyof T[K1][K2][K3][K4][K5]
+    >(
+        _1: K1,
+        _2: K2,
+        _3: K3,
+        _4: K4,
+        _5: K5,
+        _6: K6,
+    ): T[K1][K2][K3][K4][K5][K6];
+    use<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4],
+        K6 extends keyof T[K1][K2][K3][K4][K5]
+    >(
+        keys: [K1, K2, K3, K4, K5, K6],
+    ): T[K1][K2][K3][K4][K5][K6];
+    use<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4],
+        K6 extends keyof T[K1][K2][K3][K4][K5],
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+    >(
+        _1: K1,
+        _2: K2,
+        _3: K3,
+        _4: K4,
+        _5: K5,
+        _6: K6,
+        _7: K6,
+    ): T[K1][K2][K3][K4][K5][K6][K7];
+    use<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4],
+        K6 extends keyof T[K1][K2][K3][K4][K5],
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+    >(
+        keys: [K1, K2, K3, K4, K5, K6, K7],
+    ): T[K1][K2][K3][K4][K5][K6][K7];
 }

@@ -190,4 +190,13 @@ export class AbonMap<K, V> extends Map<K, V> {
 
         return record;
     }
+
+    get readonly(): ReadonlyAbonMap<K, V> {
+        return this;
+    }
+}
+
+interface ReadonlyAbonMap<K, V> extends Omit<AbonMap<K, V>, "clear" | "notify" | "set" | "patch" | "delete" | "readonly" | "use"> {
+    use(key: K): V | undefined;
+    use(): ReadonlyAbonMap<K, V>;
 }

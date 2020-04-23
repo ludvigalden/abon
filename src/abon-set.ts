@@ -140,6 +140,10 @@ export class AbonSet<T> extends Set<T> {
         Notifier.get<this>(this).notify(this);
     }
 
+    get readonly(): ReadonlyAbonSet<T> {
+        return this;
+    }
+
     static use<T>(initial?: () => Iterable<T>, deps: readonly any[] = []): AbonSet<T> {
         return AbonSet.useRef(initial, deps).use();
     }
@@ -147,4 +151,8 @@ export class AbonSet<T> extends Set<T> {
     static useRef<T>(initial?: () => Iterable<T>, deps: readonly any[] = []): AbonSet<T> {
         return React.useMemo(() => new AbonSet(typeof initial === "function" ? initial() : undefined), deps);
     }
+}
+
+interface ReadonlyAbonSet<T> extends Omit<AbonSet<T>, "notify" | "clear" | "modify" | "set" | "delete" | "add" | "readonly" | "use"> {
+    use(): ReadonlyAbonSet<T>;
 }

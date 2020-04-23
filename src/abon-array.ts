@@ -57,9 +57,32 @@ export class AbonArray<T> extends Array<T> {
         return undefined;
     }
 
+    /** Removes the first item and returns it. */
+    shift(): T | undefined {
+        if (this.length > 0) {
+            const shifted = super.shift();
+            this.notify();
+            return shifted;
+        }
+
+        return undefined;
+    }
+
     /** Reverse the items */
     reverse(): this {
         this.set(this.current.reverse());
+        return this;
+    }
+
+    splice(start: number, deleteCount?: number | undefined): T[] {
+        const array = this.current;
+        const spliced = array.splice(start, deleteCount);
+        this.set(array);
+        return spliced;
+    }
+
+    fill(value: T, start?: number | undefined, end?: number | undefined): this {
+        this.set(this.current.fill(value, start, end));
         return this;
     }
 
@@ -96,6 +119,11 @@ export class AbonArray<T> extends Array<T> {
         );
     }
 
+    /** A read-only version of the instance (for typings). */
+    get readonly(): ReadonlyAbonArray<T> {
+        return this;
+    }
+
     notify() {
         Notifier.get(this).notify(this.current);
     }
@@ -107,4 +135,13 @@ export class AbonArray<T> extends Array<T> {
     static useRef<T>(initial?: () => T[], deps: readonly any[] = []): AbonArray<T> {
         return React.useMemo(() => new AbonArray(typeof initial === "function" ? initial() : undefined), deps);
     }
+}
+
+interface ReadonlyAbonArray<T>
+    extends Omit<
+        AbonArray<T>,
+        "set" | "delete" | "push" | "unshift" | "reverse" | "notify" | "readonly" | "use" | "current" | "fill" | "pop" | "splice" | "shift"
+    > {
+    use(): ReadonlyAbonArray<T>;
+    readonly current: T[];
 }

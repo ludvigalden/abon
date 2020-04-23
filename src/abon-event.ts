@@ -63,7 +63,13 @@ export class AbonEvent<E = undefined, P = undefined> {
         );
     }
 
+    get readonly(): ReadonlyAbonEvent<E, P> {
+        return this;
+    }
+
     static use<E = undefined, P = undefined>(deps: readonly any[] = []): AbonEvent<E, P> {
         return React.useMemo(() => new AbonEvent(), deps);
     }
 }
+
+interface ReadonlyAbonEvent<E, P> extends Omit<AbonEvent<E, P>, "notify" | "readonly"> {}
