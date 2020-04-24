@@ -48,7 +48,8 @@ export class AbonEvent<E = undefined, P = undefined> {
     use(event: E, listener: EventPayloadListener<P>, deps?: readonly any[]): UnsubscribeFn;
     use(event: E, payload: P, listener: Listener, deps?: readonly any[]): UnsubscribeFn;
     use(...args: any[]): any {
-        const hasDeps = Array.isArray(args[args.length - 1]);
+        const deps = args[args.length - 1];
+        const hasDeps = Array.isArray(deps);
 
         useClearedMemo(
             () => {
@@ -59,11 +60,15 @@ export class AbonEvent<E = undefined, P = undefined> {
                 }
             },
             (unsubscribe) => unsubscribe(),
-            hasDeps ? [this, ...args[args.length - 1]] : [this],
+            hasDeps ? [this, ...deps] : [this],
         );
     }
 
     get readonly(): ReadonlyAbonEvent<E, P> {
+        return this;
+    }
+
+    get writeonly(): WriteonlyAbonEvent<E, P> {
         return this;
     }
 
@@ -73,3 +78,4 @@ export class AbonEvent<E = undefined, P = undefined> {
 }
 
 interface ReadonlyAbonEvent<E, P> extends Omit<AbonEvent<E, P>, "notify" | "readonly"> {}
+interface WriteonlyAbonEvent<E, P> extends Pick<AbonEvent<E, P>, "notify"> {}

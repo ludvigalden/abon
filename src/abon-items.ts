@@ -23,12 +23,12 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
             | "includes"
             | "length"
         > {
-    ids: AbonArray<T[I]>;
+    ids: AbonArray<T[I]>["readonly"];
 
     constructor(readonly idKey: I, initial?: T[]) {
         super(AbonItems.record(initial || [], idKey));
 
-        this.ids = new AbonArray(AbonItems.ids(initial || [], idKey));
+        this.ids = new AbonArray(AbonItems.ids(initial || [], idKey)).readonly;
     }
 
     /** Set the items */
@@ -152,13 +152,20 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
                 const current = AbonItems.record(items, this.idKey);
 
                 const notifyIds = !isEqual(ids, this.ids.current);
+                // if the ids are unequal but the current is equal, the order of the items has changed
+                // and AbonDeep will not notify root subscriptions
+                const notifyRoot = notifyIds && !isEqual(current, this.current);
 
-                this.ids.current = ids;
+                this.internalIds.current = ids;
 
                 super.set(current);
 
+                if (notifyRoot) {
+                    this.notify([]);
+                }
+
                 if (notifyIds) {
-                    this.ids.notify();
+                    this.internalIds.notify();
                 }
             }
         } else {
@@ -272,7 +279,7 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
     includes(item: T): boolean;
     includes(id: T[I]): boolean;
     includes(thunk: T | T[I]): boolean {
-        const id = thunk && typeof thunk === "object" ? (thunk as T)[this.idKey] : thunk;
+        const id = (thunk && typeof thunk === "object" ? (thunk as T)[this.idKey] : thunk) as T[I];
         return this.ids.includes(id);
     }
 
@@ -296,7 +303,7 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
     indexOf(id: T[I], fromIndex?: number): number;
     indexOf(thunk: T | T[I], fromIndex?: number): number;
     indexOf(thunk: T | T[I], fromIndex?: number): number {
-        const id = thunk && typeof thunk === "object" ? (thunk as T)[this.idKey] : thunk;
+        const id = (thunk && typeof thunk === "object" ? (thunk as T)[this.idKey] : thunk) as T[I];
         return this.ids.indexOf(id, fromIndex);
     }
 
@@ -567,16 +574,12 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
         return super.get(...(args as [any]));
     }
 
-    notify(): this;
-    notify(keys: (keyof any)[], ...args: any[]): this;
-    notify(keys?: (keyof any)[], ...args: any[]) {
-        if (keys && !keys.length && args.length === 1) {
-            super.notify(keys, args[0], this.array, this.ids.current);
-        } else {
-            super.notify(keys as any, ...args);
-        }
+    protected get rootSubscriptionArgs() {
+        return [this.array, this.ids.current];
+    }
 
-        return this;
+    private get internalIds(): AbonArray<T[I]> {
+        return this.ids as any;
     }
 
     get readonly(): ReadonlyAbonItems<T, I> {
@@ -593,8 +596,8 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
         return record;
     }
 
-    static ids<T extends object, I extends keyof T>(items: T[], idKey: I) {
-        return items.map((item) => (!item ? item : item[idKey]));
+    static ids<T extends object, I extends keyof T>(items: T[], idKey: I): T[I][] {
+        return items.map((item) => (!item ? (item as any) : item[idKey]));
     }
 }
 

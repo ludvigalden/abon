@@ -1,6 +1,6 @@
 import isEqual from "lodash/isEqual";
 
-import { NotifierDeep, Notifier } from "./notifier";
+import { NotifierDeep } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";
 import { useClearedMemo, useForceUpdate } from "./utils";
 
@@ -161,18 +161,15 @@ export class AbonMap<K, V> extends Map<K, V> {
     }
 
     notify(keys?: K[]) {
-        if (NotifierDeep.get(this).has(NotifierDeep.notifierKeyDivider)) {
-            (NotifierDeep.get(this).get(NotifierDeep.notifierKeyDivider) as Notifier<this>).notify(this);
-        }
+        const notifier = NotifierDeep.get(this);
+
+        notifier.notify([], this);
 
         Array.from(this.keys()).forEach((key) => {
             if (keys && !keys.includes(key)) {
                 return;
             }
-
-            if (NotifierDeep.get(this).has(key as any)) {
-                (NotifierDeep.get(this).get(key as any) as Notifier<V>).notify(this.get(key) as V);
-            }
+            notifier.notify([key as any], this.get(key));
         });
     }
 

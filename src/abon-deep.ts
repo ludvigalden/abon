@@ -2,6 +2,8 @@ import React from "react";
 import isEqual from "lodash/isEqual";
 import get from "lodash/get";
 import set from "lodash/set";
+import merge from "lodash/merge";
+import { PropertyPath } from "lodash";
 
 import { NotifierDeep } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";
@@ -87,59 +89,46 @@ export class AbonDeep<T extends object> {
     set(...args: any[]) {
         const { keys, value } = AbonDeep.parseKeyValueArgs(args);
 
+        let before: T;
+
         if (!keys.length) {
-            if (!isEqual(value, this.current)) {
-                const before = this.current;
-                this.current = value;
+            before = this.current;
 
-                Array.from(NotifierDeep.get(this).keys()).forEach((notifierKey) => {
-                    if (notifierKey === NotifierDeep.notifierKeyDivider) {
-                        this.notify([], this.current);
-                    } else {
-                        const keys = NotifierDeep.parseNotifierKey(notifierKey);
+            this.current = value;
 
-                        const valueBefore = get(before, keys);
-                        const valueNext = get(value, keys);
-
-                        if (!isEqual(valueBefore, valueNext)) {
-                            this.notify(keys, valueNext);
-                        }
-                    }
-                });
-            } else {
-                this.current = value;
+            if (isEqual(before, this.current)) {
+                return;
             }
         } else {
-            const preValue = get(this.current, keys);
+            before = merge({}, this.current);
 
-            if (!isEqual(preValue, value)) {
-                set(this.current, keys, value);
+            const preValue = AbonDeep.get(before, keys);
+            AbonDeep.set(this.current, keys, value);
 
-                this.notify([], this.current);
-
-                keys.forEach((_, i) => {
-                    const notifyKeys = keys.slice(0, i + 1);
-
-                    this.notify(notifyKeys as any, get(this.current, notifyKeys as any));
-                });
-
-                const notifierKey = NotifierDeep.formatNotifierKey(keys);
-
-                Array.from(NotifierDeep.get(this).keys()).forEach((_anyNotifierKey) => {
-                    const anyNotifierKey = String(_anyNotifierKey);
-
-                    if (anyNotifierKey.length <= notifierKey.length || anyNotifierKey.substr(0, notifierKey.length) !== notifierKey) {
-                        return;
-                    }
-
-                    const valueChildKeys = NotifierDeep.parseNotifierKey(anyNotifierKey).slice(keys.length);
-
-                    if (!isEqual(get(preValue, valueChildKeys), get(value, valueChildKeys))) {
-                        this.notify([...keys, ...valueChildKeys], get(value, valueChildKeys));
-                    }
-                });
+            if (isEqual(preValue, value)) {
+                return;
             }
         }
+
+        const matches = NotifierDeep.get(this).getRelated(keys);
+
+        Array.from(matches.entries()).forEach(([key, notifier]) => {
+            if (!key.length) {
+                // we know this value is not equal
+                notifier.notify(value, ...this.rootSubscriptionArgs);
+            } else if (key.length === keys.length && isEqual(key, keys)) {
+                // we know this value is not equal
+                notifier.notify(value);
+                return;
+            }
+
+            const keyValueBefore = AbonDeep.get(before, key);
+            const keyValue = AbonDeep.get(this.current, key);
+
+            if (!isEqual(keyValueBefore, keyValue)) {
+                notifier.notify(keyValue);
+            }
+        });
 
         return this;
     }
@@ -215,7 +204,7 @@ export class AbonDeep<T extends object> {
         if (!keys.length) {
             return this.current;
         } else {
-            return get(this.current, keys);
+            return AbonDeep.get(this.current, keys);
         }
     }
 
@@ -389,7 +378,7 @@ export class AbonDeep<T extends object> {
                     });
                 },
                 (unsubscribe) => unsubscribe(),
-                [this, listener, value, NotifierDeep.formatNotifierKey(keys)],
+                [this, listener, value, NotifierDeep.get(this).key(keys)],
             );
 
             return value.current;
@@ -477,7 +466,7 @@ export class AbonDeep<T extends object> {
         useClearedMemo(
             () => this.subscribe(keys as any, value),
             (unsubscribe) => unsubscribe(),
-            [this, value, NotifierDeep.formatNotifierKey(keys)],
+            [this, value, NotifierDeep.get(this).key(keys)],
         );
 
         return this;
@@ -486,20 +475,39 @@ export class AbonDeep<T extends object> {
     notify(): this;
     notify(keys: (keyof any)[], ...args: any[]): this;
     notify(keys?: (keyof any)[], ...args: any[]) {
+        const notifier = NotifierDeep.get(this);
+
         if (keys) {
-            NotifierDeep.get(this).notify(keys, ...args);
+            if (!keys.length) {
+                if (!args.length) {
+                    args.unshift(this.get(keys as any));
+                }
+
+                if (args.length === 1) {
+                    args.push(...this.rootSubscriptionArgs);
+                }
+            } else {
+                if (!args.length) {
+                    args.unshift(this.get(keys as any));
+                }
+            }
+
+            notifier.notify(keys, ...args);
         } else {
-            Array.from(NotifierDeep.get(this).keys()).forEach((notifierKey) => {
-                if (notifierKey === NotifierDeep.notifierKeyDivider) {
-                    NotifierDeep.get(this).notify([], this.current);
+            Array.from(notifier.keys()).forEach((key) => {
+                if (!key.length) {
+                    notifier.notify(key, this.current, ...this.rootSubscriptionArgs);
                 } else {
-                    const keys = NotifierDeep.parseNotifierKey(notifierKey) as any;
-                    NotifierDeep.get(this).notify(keys, this.get(keys));
+                    notifier.notify(key, this.get(key as any));
                 }
             });
         }
 
         return this;
+    }
+
+    protected get rootSubscriptionArgs(): any[] {
+        return [];
     }
 
     get readonly(): ReadonlyAbonDeep<T> {
@@ -523,6 +531,14 @@ export class AbonDeep<T extends object> {
         } else {
             return args;
         }
+    }
+
+    static set<T>(object: object, path: readonly (keyof any)[], value: any) {
+        return set<T>(object, path, value);
+    }
+
+    static get<T>(object: any, path: PropertyPath, defaultValue?: T | undefined): T {
+        return get<T>(object, path, defaultValue as any);
     }
 }
 

@@ -86,6 +86,31 @@ export class AbonArray<T> extends Array<T> {
         return this;
     }
 
+    map<U>(callbackfn: (value: T, index: number, array: T[]) => U): U[] {
+        return this.current.map(callbackfn);
+    }
+
+    /** Sorts the array */
+    sort(compareFn?: (a: T, b: T) => number): this {
+        return this.set(this.current.sort(compareFn));
+    }
+
+    /**
+     * Returns the elements of an array that meet the condition specified in a callback function.
+     * @param callbackfn A function that accepts up to three arguments. The filter method calls the callbackfn function one time for each element in the array.
+     * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
+     */
+    filter<S extends T>(callbackfn: (value: T, index: number, array: T[]) => value is S): S[];
+    /**
+     * Returns the elements of an array that meet the condition specified in a callback function.
+     * @param callbackfn A function that accepts up to three arguments. The filter method calls the callbackfn function one time for each element in the array.
+     * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
+     */
+    filter(callbackfn: (value: T, index: number, array: T[]) => unknown): T[];
+    filter<S extends T>(callbackfn: (value: T, index: number, array: T[]) => value is S): S[] {
+        return this.current.filter(callbackfn);
+    }
+
     subscribe(listener: ChangeListener<T[]>): UnsubscribeFn {
         return Notifier.get<T[]>(this).subscribe(listener);
     }

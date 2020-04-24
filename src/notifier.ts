@@ -1,3 +1,5 @@
+import isEqual from "lodash/isEqual";
+
 import { ChangeListener, UnsubscribeFn } from "./types";
 
 export class Notifier<T> extends Set<ChangeListener<T>> {
@@ -20,11 +22,11 @@ export class Notifier<T> extends Set<ChangeListener<T>> {
     }
 
     static get<T>(abon: any): Notifier<T> {
-        return (abon as any).$notifier;
+        return (abon as any)[KEY];
     }
 
     static define<T>(abon: T): T {
-        Object.defineProperty(abon, "$notifier", {
+        Object.defineProperty(abon, KEY, {
             value: new Notifier(),
             configurable: false,
             writable: false,
@@ -35,58 +37,76 @@ export class Notifier<T> extends Set<ChangeListener<T>> {
     }
 }
 
-const NOTIFIER_KEY_DIVIDER = "/:/";
+export class NotifierDeep extends Map<Key[], Notifier<unknown>> {
+    getNotifier<T = unknown>(keys: Key[]): { key: Key[]; notifier: Notifier<T> } {
+        const key = this.key(keys);
 
-export class NotifierDeep extends Map<keyof any, Notifier<any>> {
-    static notifierKeyDivider = NOTIFIER_KEY_DIVIDER;
-
-    static formatNotifierKey(keys: (keyof any)[]) {
-        if (!keys.length) {
-            return NotifierDeep.notifierKeyDivider || NOTIFIER_KEY_DIVIDER;
+        if (super.has(key)) {
+            return { notifier: super.get(key) as Notifier<T>, key };
+        } else {
+            const notifier = new Notifier<T>();
+            super.set(key, notifier as Notifier<unknown>);
+            return { notifier, key: keys };
         }
-
-        return keys.join(NotifierDeep.notifierKeyDivider || NOTIFIER_KEY_DIVIDER);
     }
 
-    static parseNotifierKey(notifierKey: keyof any): string[] {
-        if (notifierKey === (NotifierDeep.notifierKeyDivider || NOTIFIER_KEY_DIVIDER)) {
-            return [];
-        }
+    subscribe<T = unknown>(keys: Key[], listener: ChangeListener<T>) {
+        const { notifier, key } = this.getNotifier<T>(keys);
 
-        return String(notifierKey)
-            .split(NotifierDeep.notifierKeyDivider || NOTIFIER_KEY_DIVIDER)
-            .filter(Boolean);
-    }
-
-    subscribe(keys: (keyof any)[], listener: ChangeListener<any>) {
-        const notifierKey = NotifierDeep.formatNotifierKey(keys);
-
-        let notifier: Notifier<any> | undefined = this.get(notifierKey);
-
-        if (!notifier) {
-            notifier = new Notifier();
-            this.set(notifierKey, notifier);
-        }
-
-        const unsubscribe = notifier.subscribe(listener);
+        notifier.add(listener);
 
         return () => {
-            unsubscribe();
+            notifier.delete(listener);
 
             if (notifier && !notifier.size) {
-                this.delete(notifierKey);
+                super.delete(key);
             }
         };
     }
 
-    notify(keys: (keyof any)[], ...args: any[]): this {
-        const notifier = this.get(NotifierDeep.formatNotifierKey(keys));
+    key(keys: Key[]) {
+        const key = Array.from(this.keys()).find((key) => key.length === keys.length && isEqual(keys, key));
+        return key || keys;
+    }
 
-        if (notifier) {
-            notifier.notify(...(args as [any]));
+    has(keys: Key[]) {
+        return super.has(this.key(keys));
+    }
+
+    get<T = unknown>(keys: Key[]): Notifier<T> {
+        return super.get(this.key(keys)) as Notifier<T>;
+    }
+
+    /** Gets related keys and notifiers */
+    getRelated(keys: Key[]): Map<Key[], Notifier<unknown>> {
+        if (!keys.length) {
+            return this;
         }
 
-        return this;
+        const related = new Map<Key[], Notifier<unknown>>();
+
+        // parent keys
+        for (let i = 0; i < keys.length; i++) {
+            const parentKey = this.key(keys.slice(0, i));
+
+            if (super.has(parentKey)) {
+                related.set(parentKey, super.get(parentKey) as Notifier<unknown>);
+            }
+        }
+
+        const key = this.key(keys);
+        if (super.has(key)) {
+            related.set(key, super.get(key) as Notifier<unknown>);
+        }
+
+        // parent or same keys keys
+        Array.from(this.keys()).forEach((key) => {
+            if (key.length > keys.length && isEqual(key.slice(0, keys.length), keys)) {
+                related.set(key, super.get(key) as Notifier<unknown>);
+            }
+        });
+
+        return related;
     }
 
     clear() {
@@ -97,12 +117,22 @@ export class NotifierDeep extends Map<keyof any, Notifier<any>> {
         super.clear();
     }
 
+    notify<T>(keys: Key[], value: T): this;
+    notify(keys: Key[], ...args: any[]): this;
+    notify<T>(keys: Key[], ...args: any[]) {
+        const notifier = this.get<T>(keys);
+        if (notifier) {
+            notifier.notify(...(args as [any]));
+        }
+        return this;
+    }
+
     static get(abon: any): NotifierDeep {
-        return (abon as any).$notifier;
+        return (abon as any)[KEY];
     }
 
     static define<T>(abon: T): T {
-        Object.defineProperty(abon, "$notifier", {
+        Object.defineProperty(abon, KEY, {
             value: new NotifierDeep(),
             configurable: false,
             writable: false,
@@ -112,3 +142,7 @@ export class NotifierDeep extends Map<keyof any, Notifier<any>> {
         return abon;
     }
 }
+
+type Key = keyof any;
+
+const KEY = "__notifier";

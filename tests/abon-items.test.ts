@@ -1,4 +1,4 @@
-import { Abon, AbonItems } from "../src";
+import { AbonItems, Abon } from "../src";
 
 describe("AbonItems", () => {
     it("constructs", () => {
@@ -65,7 +65,7 @@ describe("AbonItems", () => {
         items.set(20, "value", 2);
 
         Promise.all(promises).then(() => done());
-    }, 10);
+    }, 100);
 
     it("notifies value push", (done) => {
         const promises: Promise<any>[] = [];
@@ -83,7 +83,7 @@ describe("AbonItems", () => {
         items.push({ id: 100 });
 
         Promise.all(promises).then(() => done());
-    }, 10);
+    }, 100);
 });
 
 interface Item {
