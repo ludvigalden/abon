@@ -1,23 +1,18 @@
 import React from "react";
 import isEqual from "lodash/isEqual";
 
-import { AbonArray } from "./abon-array";
 import { AbonDeep } from "./abon-deep";
-import { AbonEvent } from "./abon-event";
-import { AbonItems } from "./abon-items";
 import { AbonMap } from "./abon-map";
 import { AbonSet } from "./abon-set";
 import { Notifier } from "./notifier";
-import { ChangeListener, UnsubscribeFn, Subscribeable } from "./types";
+import { UnsubscribeFn, Subscribeable, ComposedSubscriberFlexResult, ComposedSubscriberFlex } from "./types";
 import { useClearedMemo, useForceUpdate } from "./utils";
+import { ReadonlyAbon } from "./readonly-abon";
 
-export class Abon<T> {
-    current: T;
-
+/** Subscribe to, retrieve, and update a value. */
+export class Abon<T> extends ReadonlyAbon<T> {
     constructor(initial?: T) {
-        this.current = initial as T;
-
-        Notifier.define(this);
+        super(initial);
     }
 
     set(value: T) {
@@ -29,36 +24,8 @@ export class Abon<T> {
         return this;
     }
 
-    subscribe(listener: ChangeListener<T>): UnsubscribeFn {
-        return Notifier.get<T>(this).subscribe(listener);
-    }
-
-    use() {
-        const listener = useForceUpdate();
-
-        useClearedMemo(
-            () => this.subscribe(listener),
-            (unsubscribe) => unsubscribe(),
-            [this, listener],
-        );
-
-        return this;
-    }
-
-    useSubscription(listener: ChangeListener<T>, deps: readonly any[] = []) {
-        useClearedMemo(
-            () => this.subscribe(listener),
-            (unsubscribe) => unsubscribe(),
-            [this, ...deps],
-        );
-    }
-
     notify() {
         Notifier.get(this).notify(this.current);
-    }
-
-    get readonly(): ReadonlyAbon<T> {
-        return this;
     }
 
     static use<T>(initial?: () => T, deps: readonly any[] = []): Abon<T> {
@@ -81,19 +48,21 @@ export class Abon<T> {
         return abon;
     }
 
-    static composedSubscription(
-        listener: () => void,
-        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
-    ): UnsubscribeFn {
-        const unsubscribeFns = listen(listener);
-        return () => Array.from(unsubscribeFns).forEach((unsubscribeFn) => typeof unsubscribeFn === "function" && unsubscribeFn());
+    static mergeUnsubscriber(result: ComposedSubscriberFlexResult): UnsubscribeFn {
+        if (typeof result === "function") {
+            return result;
+        } else if (Array.isArray(result)) {
+            return () => Array.from(result).forEach((unsubscribeFn) => typeof unsubscribeFn === "function" && unsubscribeFn());
+        } else {
+            return () => {};
+        }
     }
 
-    static useComposedSubscription(
-        listener: () => void,
-        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
-        deps: readonly any[] = [],
-    ) {
+    static composedSubscription(listener: () => void, listen: ComposedSubscriberFlex): UnsubscribeFn {
+        return this.mergeUnsubscriber(listen(listener));
+    }
+
+    static useComposedSubscription(listener: () => void, listen: ComposedSubscriberFlex, deps: readonly any[] = []) {
         useClearedMemo(
             () => this.composedSubscription(listener, listen),
             (unsubscribe) => unsubscribe(),
@@ -101,11 +70,7 @@ export class Abon<T> {
         );
     }
 
-    static useComposedValue<T>(
-        getValue: () => T,
-        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
-        deps: readonly any[] = [],
-    ): T {
+    static useComposedValue<T>(getValue: () => T, listen: ComposedSubscriberFlex, deps: readonly any[] = []): T {
         const listener = useForceUpdate();
         const value = React.useRef<T>();
 
@@ -134,11 +99,7 @@ export class Abon<T> {
         return value.current as T;
     }
 
-    static useComposedValueAsync<T>(
-        getValue: () => Promise<T>,
-        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
-        deps: readonly any[] = [],
-    ): T | undefined {
+    static useComposedValueAsync<T>(getValue: () => Promise<T>, listen: ComposedSubscriberFlex, deps: readonly any[] = []): T | undefined {
         const listener = useForceUpdate();
         const value = React.useRef<T>();
         const getting = React.useRef<symbol>();
@@ -182,24 +143,16 @@ export class Abon<T> {
      * ``` */
     static from<T>(
         getValue: () => T,
-        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
+        listen: ComposedSubscriberFlex,
         setUnsubscribe?: (unsubscribe: UnsubscribeFn) => void,
-    ): Abon<T>;
+    ): ReadonlyAbon<T>;
+    static from<T>(getValue: () => T, listen: ComposedSubscriberFlex, unsubscribeFns?: Set<Function>): ReadonlyAbon<T>;
+    static from<T>(getValue: () => T, listen: ComposedSubscriberFlex, unsubscribeFns?: Set<Function>): ReadonlyAbon<T>;
     static from<T>(
         getValue: () => T,
-        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
-        unsubscribeFns?: Set<Function>,
-    ): Abon<T>;
-    static from<T>(
-        getValue: () => T,
-        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
-        unsubscribeFns?: Set<Function>,
-    ): Abon<T>;
-    static from<T>(
-        getValue: () => T,
-        listen: (listener: () => void) => Iterable<UnsubscribeFn | boolean | undefined | null | void>,
+        listen: ComposedSubscriberFlex,
         unsubscribe?: Set<Function> | ((unsubscribe: UnsubscribeFn) => void),
-    ): Abon<T> {
+    ): ReadonlyAbon<T> {
         const abon = new Abon(getValue());
 
         const subscription = Abon.composedSubscription(function() {
@@ -218,7 +171,7 @@ export class Abon<T> {
     }
 
     static resolve<T>(listen: (listener: (value?: T) => void) => UnsubscribeFn): PromiseLike<void>;
-    static resolve<T>(abon: Abon<T>): PromiseLike<T>;
+    static resolve<T>(abon: ReadonlyAbon<T>): PromiseLike<T>;
     static resolve<T extends object>(abon: AbonDeep<T>): PromiseLike<T>;
     static resolve<AM extends AbonMap<any, any>>(map: AM): PromiseLike<AM>;
     static resolve<AS extends AbonSet<any>>(set: AS): PromiseLike<AS>;
@@ -287,17 +240,6 @@ export class Abon<T> {
             },
         };
     }
-
-    static Array = AbonArray;
-    static Deep = AbonDeep;
-    static Event = AbonEvent;
-    static Items = AbonItems;
-    static Map = AbonMap;
-    static Set = AbonSet;
 }
 
 const INITIAL_VALUE = Symbol("INITIAL");
-
-interface ReadonlyAbon<T> extends Omit<Abon<T>, "set" | "notify" | "readonly" | "use"> {
-    use(): ReadonlyAbon<T>;
-}

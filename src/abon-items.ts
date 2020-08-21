@@ -5,6 +5,7 @@ import { AbonArray } from "./abon-array";
 import { AbonDeep } from "./abon-deep";
 import { ChangeListener, UnsubscribeFn, ItemRecord, ItemRecordKey, ItemsChangeListener } from "./types";
 
+/** Subscribe to and update an ordered list of identifiable objects. */
 export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<ItemRecord<T, I>>
     implements
         Pick<
@@ -133,17 +134,14 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
             } else {
                 let items: T[] = value;
 
-                if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-                    const invalidItemIndex = items.findIndex((item) => !item || item[this.idKey] == null);
-
-                    if (invalidItemIndex >= 0) {
-                        throw new Error(
-                            `An invalid item was passed at index ${invalidItemIndex}: \n\t` +
-                                "[" +
-                                items.map((item) => (!item || item[this.idKey] == null ? "null" : String(item[this.idKey]))).join(", ") +
-                                "]",
-                        );
-                    }
+                const invalidItemIndex = items.findIndex((item) => !item || item[this.idKey] == null);
+                if (invalidItemIndex >= 0) {
+                    const error =
+                        `An invalid item was passed at index ${invalidItemIndex}: \n\t` +
+                        "[" +
+                        items.map((item) => (!item || item[this.idKey] == null ? "null" : String(item[this.idKey]))).join(", ") +
+                        "]";
+                    throw new Error(error);
                 }
 
                 items = uniqBy(items, (item) => item[this.idKey]);
@@ -197,21 +195,18 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
      * @param items New items to append.
      */
     push(...items: T[]): number {
-        if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-            const undefinedItemIndex = this.array.findIndex((item) => !item || item[this.idKey] == null);
-
-            if (undefinedItemIndex >= 0) {
-                throw new Error(
-                    `An invalid item exists at at index ${undefinedItemIndex} (mismatch between ids and defined items). Was AbonItems.current or AbonItems.ids mutated incorrectly?` +
-                        "\n\titems: [" +
-                        this.array.map((item) => (!item || item[this.idKey] == null ? "null" : String(item[this.idKey]))).join(", ") +
-                        `]\n\tcurrent: {` +
-                        Object.keys(this.current)
-                            .map((id) => ` ${id}: {...} `)
-                            .join(",") +
-                        `}\n\tids: [${this.ids.current.join(", ")}]`,
-                );
-            }
+        const undefinedItemIndex = this.array.findIndex((item) => !item || item[this.idKey] == null);
+        if (undefinedItemIndex >= 0) {
+            const error =
+                `An invalid item exists at at index ${undefinedItemIndex} (mismatch between ids and defined items). Was AbonItems.current or AbonItems.ids mutated incorrectly?` +
+                "\n\titems: [" +
+                this.array.map((item) => (!item || item[this.idKey] == null ? "null" : String(item[this.idKey]))).join(", ") +
+                `]\n\tcurrent: {` +
+                Object.keys(this.current)
+                    .map((id) => ` ${id}: {...} `)
+                    .join(",") +
+                `}\n\tids: [${this.ids.current.join(", ")}]`;
+            throw new Error(error);
         }
 
         items = uniqBy(items, (item) => item[this.idKey]);
@@ -233,21 +228,18 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
      * @param items  New items to insert at the start of the list.
      */
     unshift(...items: T[]): number {
-        if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-            const undefinedItemIndex = this.array.findIndex((item) => !item || item[this.idKey] == null);
-
-            if (undefinedItemIndex >= 0) {
-                throw new Error(
-                    `An invalid item exists at at index ${undefinedItemIndex} (mismatch between ids and defined items). Was AbonItems.current or AbonItems.ids mutated incorrectly?` +
-                        "\n\titems: [" +
-                        this.array.map((item) => (!item || item[this.idKey] == null ? "null" : String(item[this.idKey]))).join(", ") +
-                        `]\n\tcurrent: {` +
-                        Object.keys(this.current)
-                            .map((id) => ` ${id}: {...} `)
-                            .join(",") +
-                        `}\n\tids: [${this.ids.current.join(", ")}]`,
-                );
-            }
+        const undefinedItemIndex = this.array.findIndex((item) => !item || item[this.idKey] == null);
+        if (undefinedItemIndex >= 0) {
+            const error =
+                `An invalid item exists at at index ${undefinedItemIndex} (mismatch between ids and defined items). Was AbonItems.current or AbonItems.ids mutated incorrectly?` +
+                "\n\titems: [" +
+                this.array.map((item) => (!item || item[this.idKey] == null ? "null" : String(item[this.idKey]))).join(", ") +
+                `]\n\tcurrent: {` +
+                Object.keys(this.current)
+                    .map((id) => ` ${id}: {...} `)
+                    .join(",") +
+                `}\n\tids: [${this.ids.current.join(", ")}]`;
+            throw new Error(error);
         }
 
         items = uniqBy(items, (item) => item[this.idKey]);

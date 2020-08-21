@@ -29,3 +29,8 @@ export type ItemRecord<T extends object, I extends keyof T> = Record<ItemRecordK
 export interface Subscribeable<T> {
     subscribe(listener: ChangeListener<T>): UnsubscribeFn;
 }
+
+export type SubscriberFlexResult = UnsubscribeFn | boolean | undefined | null | void;
+export type ComposedSubscriberFlexResult = SubscriberFlexResult | Iterable<SubscriberFlexResult>;
+
+export type ComposedSubscriberFlex = (listener: () => void) => ComposedSubscriberFlexResult;

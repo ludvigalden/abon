@@ -2,8 +2,9 @@ import React from "react";
 
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";
-import { useClearedMemo, useForceUpdate } from "./utils";
+import { useClearedMemo, useForceUpdate, Falsey } from "./utils";
 
+/** Subscribe to and set the values of a `Set`. */
 export class AbonSet<T> extends Set<T> {
     constructor(initial?: Iterable<T>) {
         super(initial);
@@ -76,10 +77,10 @@ export class AbonSet<T> extends Set<T> {
     }
 
     /** Use iterables to add or remove values and notify subscribers if there's a diff. */
-    modify(add?: Iterable<T> | null | false, remove?: Iterable<T> | null | false): boolean;
+    modify(add?: Iterable<T> | Falsey, remove?: Iterable<T> | Falsey): boolean;
     /** Use iterables to add or remove values without notifying subscribers. */
-    modify(add?: Iterable<T> | null | false, remove?: Iterable<T> | null | false, silent?: true): boolean;
-    modify(add?: Iterable<T> | null | false, remove?: Iterable<T> | null | false, silent?: true) {
+    modify(add?: Iterable<T> | Falsey, remove?: Iterable<T> | Falsey, silent?: true): boolean;
+    modify(add?: Iterable<T> | Falsey, remove?: Iterable<T> | Falsey, silent?: true) {
         let modifiedAny = false;
 
         if (add) {

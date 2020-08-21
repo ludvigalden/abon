@@ -5,6 +5,7 @@ import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";
 import { useClearedMemo, useForceUpdate } from "./utils";
 
+/** Subscribe to and update a normal array. */
 export class AbonArray<T> extends Array<T> {
     constructor(initial: Iterable<T> = []) {
         super(...Array.from(initial));

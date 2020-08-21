@@ -4,7 +4,7 @@ import { NotifierDeep } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";
 import { useClearedMemo, useForceUpdate } from "./utils";
 
-/** A subscribeable implementation of a `Map`. */
+/** Subscribe to and set the entries of a `Map`. */
 export class AbonMap<K, V> extends Map<K, V> {
     constructor(initial?: readonly (readonly [K, V])[] | null) {
         super(initial);
@@ -186,6 +186,14 @@ export class AbonMap<K, V> extends Map<K, V> {
         });
 
         return record;
+    }
+
+    protected silentlySet(key: K, value: V): this {
+        return super.set(key, value);
+    }
+
+    protected silentlyDelete(key: K) {
+        return super.delete(key);
     }
 
     get readonly(): ReadonlyAbonMap<K, V> {
