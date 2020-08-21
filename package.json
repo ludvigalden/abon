@@ -1,7 +1,7 @@
 {
 	"name": "abon",
 	"description": "Complex state in React made simple 🚀",
-	"version": "0.0.13",
+	"version": "0.1.0",
 	"license": "MIT",
 	"author": "Ludvig Aldén <ludvig@tifum.com>",
 	"repository": "ludvigalden/abon",
@@ -41,7 +41,8 @@
 		"size": "size-limit"
 	},
 	"dependencies": {
-		"lodash-es": "^4.17.15"
+		"lodash": "*",
+		"use-cleared-memo": "0.1.0"
 	},
 	"peerDependencies": {
 		"react": ">=16.8.0"
