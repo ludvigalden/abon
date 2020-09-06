@@ -3,6 +3,7 @@ import { Notifier } from "./notifier";
 /** Allows for dispatching promises that can be made irrelevant by future dispatches. */
 export class PromiseDispatcher<T = any> {
     private __dispatchId?: symbol;
+    private __previousDispatchId?: symbol;
     private __promiseNotifier?: Notifier<any>;
 
     protected current: T;
@@ -22,6 +23,8 @@ export class PromiseDispatcher<T = any> {
         this.__dispatchId = dispatchId;
         const value = await promise;
         if (this.__dispatchId === dispatchId) {
+            delete this.__dispatchId;
+            this.__previousDispatchId = dispatchId;
             this.setCurrent(value);
             (this.__promiseNotifier as Notifier<any>).notify(undefined);
             if (typeof onResolvedUninterrupted === "function") {
@@ -41,8 +44,10 @@ export class PromiseDispatcher<T = any> {
             this.__dispatchId = dispatchId;
         }
         await promise;
-        if (this.__dispatchId === dispatchId) {
+        if (this.__dispatchId === dispatchId || (!this.__dispatchId && this.__previousDispatchId === dispatchId)) {
             if (!currentDispatchExists) {
+                delete this.__dispatchId;
+                this.__previousDispatchId = dispatchId;
                 (this.__promiseNotifier as Notifier<undefined>).notify(undefined);
             }
             if (typeof onResolvedUninterrupted === "function") {
