@@ -1,3 +1,4 @@
+import React from "react";
 import isEqual from "lodash/isEqual";
 
 import { Abon } from "./abon";
@@ -33,5 +34,13 @@ export class AbonInheritedDown<T> extends ReadonlyAbonInheritedDown<T> implement
             return this.parent.current as T;
         }
         return value;
+    }
+
+    static use<T extends object>(initial?: () => T, deps: readonly any[] = []) {
+        return this.useRef(initial, deps).use();
+    }
+
+    static useRef<T extends object>(initial?: () => T, deps: readonly any[] = []): AbonInheritedDown<T> {
+        return React.useMemo(() => new AbonInheritedDown((typeof initial === "function" ? initial() : undefined) as T), deps);
     }
 }

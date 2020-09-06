@@ -1,3 +1,4 @@
+import React from "react";
 import isEqual from "lodash/isEqual";
 import set from "lodash/set";
 import merge from "lodash/merge";
@@ -169,5 +170,13 @@ export class AbonDeep<T extends object> extends ReadonlyAbonDeep<T> {
 
     static set<T>(object: object, path: readonly (keyof any)[], value: any) {
         return set<T>(object, path, value);
+    }
+
+    static use<T extends object>(initial?: () => T, deps: readonly any[] = []) {
+        return this.useRef(initial, deps).use();
+    }
+
+    static useRef<T extends object>(initial?: () => T, deps: readonly any[] = []): AbonDeep<T> {
+        return React.useMemo(() => new AbonDeep((typeof initial === "function" ? initial() : undefined) as T), deps);
     }
 }

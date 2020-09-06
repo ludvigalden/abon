@@ -1,12 +1,13 @@
 import React from "react";
 import isEqual from "lodash/isEqual";
+import useClearedMemo from "use-cleared-memo";
 
 import { AbonDeep } from "./abon-deep";
 import { AbonMap } from "./abon-map";
 import { AbonSet } from "./abon-set";
 import { Notifier } from "./notifier";
 import { UnsubscribeFn, Subscribeable, ComposedSubscriberFlexResult, ComposedSubscriberFlex } from "./types";
-import { useClearedMemo, useForceUpdate, validateListener } from "./utils";
+import { useForceUpdate, validateListener } from "./utils";
 import { ReadonlyAbon } from "./readonly-abon";
 
 /** Subscribe to, retrieve, and update a value. */

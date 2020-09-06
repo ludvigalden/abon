@@ -1,8 +1,9 @@
 import React from "react";
+import useClearedMemo from "use-cleared-memo";
 
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
-import { useClearedMemo, useForceUpdate, Falsey, validateListener } from "./utils";
+import { useForceUpdate, Falsey, validateListener } from "./utils";
 
 /** Subscribe to and set the values of a `Set`. */
 export class AbonSet<T> extends Set<T> {

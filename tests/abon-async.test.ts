@@ -1,6 +1,6 @@
 import { AbonAsync } from "../src";
 
-describe("AbonInheritedUp", () => {
+describe("AbonAsync", () => {
     interface Animal {
         name: string;
     }
@@ -21,7 +21,7 @@ describe("AbonInheritedUp", () => {
         expect(animal.current).toStrictEqual(animals.cow);
 
         promises.push(
-            animal.dispatch(
+            animal.set(
                 new Promise((resolve) =>
                     setTimeout(() => {
                         resolve(animals.horse);
@@ -30,7 +30,7 @@ describe("AbonInheritedUp", () => {
             ),
         );
         promises.push(
-            animal.dispatch(
+            animal.set(
                 new Promise((resolve) =>
                     setTimeout(() => {
                         resolve(animals.pig);
@@ -39,7 +39,7 @@ describe("AbonInheritedUp", () => {
             ),
         );
         const result = animal
-            .dispatch(
+            .set(
                 new Promise((resolve) =>
                     setTimeout(() => {
                         resolve(animals.sheep);

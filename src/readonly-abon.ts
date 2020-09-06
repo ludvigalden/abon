@@ -1,6 +1,8 @@
+import useClearedMemo from "use-cleared-memo";
+
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn, Subscribeable, ValueHandler } from "./types";
-import { useClearedMemo, useForceUpdate, validateListener } from "./utils";
+import { useForceUpdate, validateListener } from "./utils";
 
 /** Retrieve and subscribe to a value. */
 export class ReadonlyAbon<T> implements Subscribeable<T> {

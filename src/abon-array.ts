@@ -1,9 +1,10 @@
 import React from "react";
 import isEqual from "lodash/isEqual";
+import useClearedMemo from "use-cleared-memo";
 
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
-import { useClearedMemo, useForceUpdate, validateListener } from "./utils";
+import { useForceUpdate, validateListener } from "./utils";
 
 /** Subscribe to and update a normal array. */
 export class AbonArray<T> extends Array<T> {

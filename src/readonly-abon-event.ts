@@ -1,6 +1,8 @@
+import useClearedMemo from "use-cleared-memo";
+
 import { Listener, EventListener, EventPayloadListener, UnsubscribeFn } from "./types";
 import { Notifier } from "./notifier";
-import { useClearedMemo, validateListener } from "./utils";
+import { validateListener } from "./utils";
 
 /** Subscribe to events and payloads. */
 export class ReadonlyAbonEvent<E = undefined, P = undefined> {

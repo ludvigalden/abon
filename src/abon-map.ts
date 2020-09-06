@@ -1,8 +1,10 @@
+import React from "react";
 import isEqual from "lodash/isEqual";
+import useClearedMemo from "use-cleared-memo";
 
 import { NotifierDeep } from "./notifier";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
-import { useClearedMemo, useForceUpdate, validateListener } from "./utils";
+import { useForceUpdate, validateListener } from "./utils";
 
 /** Subscribe to and set the entries of a `Map`. */
 export class AbonMap<K, V> extends Map<K, V> {
@@ -245,6 +247,14 @@ export class AbonMap<K, V> extends Map<K, V> {
 
     get readonly(): ReadonlyAbonMap<K, V> {
         return this;
+    }
+
+    static use<K, V>(initial?: () => readonly (readonly [K, V])[] | null, deps: readonly any[] = []): AbonMap<K, V> {
+        return this.useRef(initial, deps).use();
+    }
+
+    static useRef<K, V>(initial?: () => readonly (readonly [K, V])[] | null, deps: readonly any[] = []): AbonMap<K, V> {
+        return React.useMemo(() => new AbonMap(typeof initial === "function" ? initial() : undefined), deps);
     }
 }
 

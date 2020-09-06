@@ -1,7 +1,9 @@
+import useClearedMemo from "use-cleared-memo";
+
 import { Abon } from "./abon";
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
-import { useForceUpdate, useClearedMemo, validateListener } from "./utils";
+import { useForceUpdate, validateListener } from "./utils";
 import { AbonSet } from "./abon-set";
 import { ReadonlyAbon } from "./readonly-abon";
 

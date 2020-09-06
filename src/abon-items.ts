@@ -1,3 +1,4 @@
+import React from "react";
 import isEqual from "lodash/isEqual";
 import uniqBy from "lodash/uniqBy";
 
@@ -590,6 +591,24 @@ export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<Ite
 
     static ids<T extends object, I extends keyof T>(items: T[], idKey: I): T[I][] {
         return items.map((item) => (!item ? (item as any) : item[idKey]));
+    }
+
+    static use<T extends object, I extends keyof T>(idKey: I, initial?: () => T[], deps?: readonly any[]): AbonItems<T, I>;
+    static use<T extends object>(initial?: () => T, deps?: readonly any[]): AbonDeep<T>;
+    static use(...args: any[]) {
+        return this.useRef(...(args as [any])).use();
+    }
+
+    static useRef<T extends object, I extends keyof T>(idKey: I, initial?: () => T[], deps?: readonly any[]): AbonItems<T, I>;
+    static useRef<T extends object>(initial?: () => T, deps?: readonly any[]): AbonDeep<T>;
+    static useRef(...args: any[]): any {
+        if (typeof args[0] === "function" || !args[0]) {
+            return super.useRef(...(args as [any]));
+        }
+        return React.useMemo(
+            () => new AbonItems(args[0] as never, typeof args[1] === "function" ? args[1]() : undefined),
+            (args[3] || []).concat(args[0]),
+        );
     }
 }
 
