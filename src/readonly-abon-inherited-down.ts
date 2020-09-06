@@ -53,6 +53,14 @@ export class ReadonlyAbonInheritedDown<T> implements ReadonlyAbon<T> {
         );
     }
 
+    useHandler(handler: ValueHandler<T>, deps: readonly any[] = []) {
+        useClearedMemo(
+            () => this.handle(handler),
+            (unsubscribe) => unsubscribe(),
+            [this, ...deps],
+        );
+    }
+
     nest() {
         return new AbonInheritedDown<T>(undefined, this);
     }

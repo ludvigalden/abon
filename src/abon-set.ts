@@ -1,8 +1,8 @@
 import React from "react";
 
 import { Notifier } from "./notifier";
-import { ChangeListener, UnsubscribeFn } from "./types";
-import { useClearedMemo, useForceUpdate, Falsey } from "./utils";
+import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
+import { useClearedMemo, useForceUpdate, Falsey, validateListener } from "./utils";
 
 /** Subscribe to and set the values of a `Set`. */
 export class AbonSet<T> extends Set<T> {
@@ -114,6 +114,12 @@ export class AbonSet<T> extends Set<T> {
         return Notifier.get<this>(this).subscribe(callback);
     }
 
+    handle(handler: ValueHandler<this>): UnsubscribeFn {
+        validateListener(handler);
+        handler(this);
+        return this.subscribe(handler);
+    }
+
     clear(): void;
     /** `Set.clear` */
     clear(silent?: true): void;
@@ -135,6 +141,22 @@ export class AbonSet<T> extends Set<T> {
         );
 
         return this;
+    }
+
+    useSubscription(listener: ChangeListener<this>, deps: readonly any[] = []) {
+        useClearedMemo(
+            () => this.subscribe(listener),
+            (unsubscribe) => unsubscribe(),
+            [this, ...deps],
+        );
+    }
+
+    useHandler(handler: ValueHandler<this>, deps: readonly any[] = []) {
+        useClearedMemo(
+            () => this.handle(handler),
+            (unsubscribe) => unsubscribe(),
+            [this, ...deps],
+        );
     }
 
     notify() {

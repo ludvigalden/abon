@@ -1,8 +1,8 @@
 import isEqual from "lodash/isEqual";
 
 import { NotifierDeep } from "./notifier";
-import { ChangeListener, UnsubscribeFn } from "./types";
-import { useClearedMemo, useForceUpdate } from "./utils";
+import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
+import { useClearedMemo, useForceUpdate, validateListener } from "./utils";
 
 /** Subscribe to and set the entries of a `Map`. */
 export class AbonMap<K, V> extends Map<K, V> {
@@ -132,14 +132,21 @@ export class AbonMap<K, V> extends Map<K, V> {
         return false;
     }
 
-    subscribe(key: K, callback: ChangeListener<V>): UnsubscribeFn;
-    subscribe(callback: ChangeListener<this>): UnsubscribeFn;
+    subscribe(key: K, listener: ChangeListener<V>): UnsubscribeFn;
+    subscribe(listener: ChangeListener<this>): UnsubscribeFn;
     subscribe(...args: any[]) {
-        if (args.length === 1) {
-            return NotifierDeep.get(this).subscribe([], args[0]);
-        } else {
-            return NotifierDeep.get(this).subscribe([args[0]], args[1]);
-        }
+        const handler = args.pop();
+        validateListener(handler);
+        return NotifierDeep.get(this).subscribe(args, handler);
+    }
+
+    handle(handler: ValueHandler<this>): UnsubscribeFn;
+    handle(handler: ChangeListener<this>): UnsubscribeFn;
+    handle(...args: any[]) {
+        const handler = args.pop();
+        validateListener(handler);
+        handler(this);
+        return NotifierDeep.get(this).subscribe(args, handler);
     }
 
     use(key: K): V | undefined;
@@ -158,6 +165,46 @@ export class AbonMap<K, V> extends Map<K, V> {
         } else {
             return this;
         }
+    }
+
+    useSubscription(key: K, listener: ChangeListener<V>, deps?: readonly any[]): void;
+    useSubscription(listener: ChangeListener<this>, deps?: readonly any[]): void;
+    useSubscription(...args: any[]) {
+        let deps: readonly any[];
+        let listener: ChangeListener<any>;
+        const finalArg = args.pop();
+        if (Array.isArray(finalArg)) {
+            deps = finalArg;
+            listener = args.pop();
+        } else {
+            deps = [];
+            listener = finalArg;
+        }
+        useClearedMemo(
+            () => this.subscribe(...(args.concat(listener) as [any])),
+            (unsubscribe) => unsubscribe(),
+            [this, args[0], ...deps],
+        );
+    }
+
+    useHandler(key: K, handler: ValueHandler<V>): void;
+    useHandler(handler: ValueHandler<this>): void;
+    useHandler(...args: any[]) {
+        let deps: readonly any[];
+        let handler: ValueHandler<any>;
+        const finalArg = args.pop();
+        if (Array.isArray(finalArg)) {
+            deps = finalArg;
+            handler = args.pop();
+        } else {
+            deps = [];
+            handler = finalArg;
+        }
+        useClearedMemo(
+            () => this.handle(...(args.concat(handler) as [any])),
+            (unsubscribe) => unsubscribe(),
+            [this, args[0], ...deps],
+        );
     }
 
     notify(keys?: K[]) {

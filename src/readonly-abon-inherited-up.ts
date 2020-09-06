@@ -85,6 +85,14 @@ export class ReadonlyAbonInheritedUp<T> implements ReadonlyAbon<T> {
         );
     }
 
+    useHandler(handler: ValueHandler<T>, deps: readonly any[] = []) {
+        useClearedMemo(
+            () => this.handle(handler),
+            (unsubscribe) => unsubscribe(),
+            [this, ...deps],
+        );
+    }
+
     get current() {
         const value = this.value.current;
         if (value === undefined && this.childValue.current) {

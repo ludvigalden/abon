@@ -6,7 +6,7 @@ import { AbonMap } from "./abon-map";
 import { AbonSet } from "./abon-set";
 import { Notifier } from "./notifier";
 import { UnsubscribeFn, Subscribeable, ComposedSubscriberFlexResult, ComposedSubscriberFlex } from "./types";
-import { useClearedMemo, useForceUpdate } from "./utils";
+import { useClearedMemo, useForceUpdate, validateListener } from "./utils";
 import { ReadonlyAbon } from "./readonly-abon";
 
 /** Subscribe to, retrieve, and update a value. */
@@ -63,7 +63,14 @@ export class Abon<T> extends ReadonlyAbon<T> {
     }
 
     static composedSubscription(listener: () => void, listen: ComposedSubscriberFlex): UnsubscribeFn {
+        validateListener(listener);
         return this.mergeUnsubscriber(listen(listener));
+    }
+
+    static composedHandler(handler: () => void, listen: ComposedSubscriberFlex): UnsubscribeFn {
+        validateListener(handler);
+        handler();
+        return this.composedSubscription(handler, listen);
     }
 
     static useComposedSubscription(listener: () => void, listen: ComposedSubscriberFlex, deps: readonly any[] = []) {

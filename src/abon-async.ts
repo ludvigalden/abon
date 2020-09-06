@@ -47,6 +47,14 @@ export class AbonAsync<T> extends PromiseDispatcher<T> implements Omit<Abon<T>, 
         );
     }
 
+    useHandler(handler: ValueHandler<T>, deps: readonly any[] = []) {
+        useClearedMemo(
+            () => this.handle(handler),
+            (unsubscribe) => unsubscribe(),
+            [this, ...deps],
+        );
+    }
+
     notify() {
         Notifier.get(this).notify(this.current);
     }
