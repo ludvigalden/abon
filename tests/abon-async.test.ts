@@ -18,14 +18,14 @@ describe("AbonAsync", () => {
         const promises: Promise<any>[] = [];
 
         const animal = new AbonAsync(animals.cow);
-        expect(animal.current).toStrictEqual(animals.cow);
+        promises.push(expect(animal.promise).resolves.toBe(animals.cow));
 
         promises.push(
             animal.set(
                 new Promise((resolve) =>
                     setTimeout(() => {
                         resolve(animals.horse);
-                    }, 20),
+                    }, 4),
                 ),
             ),
         );
@@ -34,7 +34,7 @@ describe("AbonAsync", () => {
                 new Promise((resolve) =>
                     setTimeout(() => {
                         resolve(animals.pig);
-                    }, 30),
+                    }, 8),
                 ),
             ),
         );
@@ -43,7 +43,7 @@ describe("AbonAsync", () => {
                 new Promise((resolve) =>
                     setTimeout(() => {
                         resolve(animals.sheep);
-                    }, 40),
+                    }, 12),
                 ),
             )
             .then(() => animal.current);
