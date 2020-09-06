@@ -9,7 +9,7 @@ export class PromiseDispatcher<T = any> {
 
     constructor(initial?: T) {
         this.current = initial as T;
-        Object.defineProperty(this, "__promiseNotfier", {
+        Object.defineProperty(this, "__promiseNotifier", {
             value: new Notifier(),
             configurable: false,
             writable: false,
@@ -23,7 +23,6 @@ export class PromiseDispatcher<T = any> {
         const value = await promise;
         if (this.__dispatchId === dispatchId) {
             this.setCurrent(value);
-            delete this.__dispatchId;
             (this.__promiseNotifier as Notifier<any>).notify(undefined);
             if (typeof onResolvedUninterrupted === "function") {
                 onResolvedUninterrupted();
@@ -32,7 +31,6 @@ export class PromiseDispatcher<T = any> {
         return this;
     }
 
-    /** */
     async dispatchForCurrent(promise: Promise<any>, onResolvedUninterrupted: () => void): Promise<this> {
         let dispatchId: symbol;
         const currentDispatchExists = Boolean(this.__dispatchId);
@@ -45,7 +43,6 @@ export class PromiseDispatcher<T = any> {
         await promise;
         if (this.__dispatchId === dispatchId) {
             if (!currentDispatchExists) {
-                delete this.__dispatchId;
                 (this.__promiseNotifier as Notifier<undefined>).notify(undefined);
             }
             if (typeof onResolvedUninterrupted === "function") {

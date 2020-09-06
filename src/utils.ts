@@ -7,3 +7,9 @@ export function useForceUpdate(): () => void {
 }
 
 export type Falsey = void | null | false | undefined;
+
+export function validateListener(listener: any) {
+    if (typeof listener !== "function") {
+        throw new Error('The listener must be a function, got "' + String(listener) + '".');
+    }
+}

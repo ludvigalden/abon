@@ -3,7 +3,7 @@ import isEqual from "lodash/isEqual";
 
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn } from "./types";
-import { useClearedMemo, useForceUpdate } from "./utils";
+import { useClearedMemo, useForceUpdate, validateListener } from "./utils";
 
 /** Subscribe to and update a normal array. */
 export class AbonArray<T> extends Array<T> {
@@ -113,6 +113,7 @@ export class AbonArray<T> extends Array<T> {
     }
 
     subscribe(listener: ChangeListener<T[]>): UnsubscribeFn {
+        validateListener(listener);
         return Notifier.get<T[]>(this).subscribe(listener);
     }
 

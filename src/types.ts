@@ -10,6 +10,10 @@ export interface ChangeListener<T> {
     (current: T): void;
 }
 
+export interface ValueHandler<T> {
+    (current: T): void;
+}
+
 export interface EventListener<E, P> {
     (event: E, payload: P): void;
 }

@@ -11,8 +11,12 @@ import { ReadonlyAbon } from "./readonly-abon";
 
 /** Subscribe to, retrieve, and update a value. */
 export class Abon<T> extends ReadonlyAbon<T> {
+    current: T;
+
     constructor(initial?: T) {
-        super(initial);
+        super();
+
+        this.current = initial as T;
     }
 
     set(value: T) {

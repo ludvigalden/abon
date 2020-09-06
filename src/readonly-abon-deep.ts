@@ -3,15 +3,14 @@ import get from "lodash/get";
 import { PropertyPath } from "lodash";
 
 import { NotifierDeep } from "./notifier";
-import { ChangeListener, UnsubscribeFn } from "./types";
-import { useClearedMemo, useForceUpdate } from "./utils";
+import { ChangeListener, ValueHandler, UnsubscribeFn } from "./types";
+import { useClearedMemo, useForceUpdate, validateListener } from "./utils";
 
 /** Retrieve and subscribe to deeply nested values. */
 export class ReadonlyAbonDeep<T extends object> {
-    current: T;
+    readonly current: T;
 
-    constructor(initial?: T) {
-        this.current = (initial || {}) as T;
+    constructor() {
         NotifierDeep.define(this);
     }
 
@@ -166,8 +165,91 @@ export class ReadonlyAbonDeep<T extends object> {
         K7 extends keyof T[K1][K2][K3][K4][K5][K6]
     >(keys: [K1, K2, K3, K4, K5, K6, K7], listener: ChangeListener<T[K1][K2][K3][K4][K5][K6][K7]>): UnsubscribeFn;
     subscribe(...args: any[]) {
-        const { keys, value } = ReadonlyAbonDeep.parseKeyValueArgs(args);
-        return NotifierDeep.get(this).subscribe(keys, value);
+        const { keys, value: listener } = ReadonlyAbonDeep.parseKeyValueArgs(args);
+        validateListener(listener);
+        return NotifierDeep.get(this).subscribe(keys, listener);
+    }
+
+    handle(handler: ValueHandler<T>): UnsubscribeFn;
+    handle(keys: [], handler: ValueHandler<T>): UnsubscribeFn;
+    handle<K extends keyof T>(key: K, handler: ValueHandler<T[K]>): UnsubscribeFn;
+    handle<K extends keyof T>(keys: [K], handler: ValueHandler<T[K]>): UnsubscribeFn;
+    handle<K1 extends keyof T, K2 extends keyof T[K1]>(_1: K1, _2: K2, handler: ValueHandler<T[K1][K2]>): UnsubscribeFn;
+    handle<K1 extends keyof T, K2 extends keyof T[K1]>(keys: [K1, K2], handler: ValueHandler<T[K1][K2]>): UnsubscribeFn;
+    handle<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2]>(
+        _1: K1,
+        _2: K2,
+        _3: K3,
+        handler: ValueHandler<T[K1][K2][K3]>,
+    ): UnsubscribeFn;
+    handle<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2]>(
+        keys: [K1, K2, K3],
+        handler: ValueHandler<T[K1][K2][K3]>,
+    ): UnsubscribeFn;
+    handle<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2], K4 extends keyof T[K1][K2][K3]>(
+        _1: K1,
+        _2: K2,
+        _3: K3,
+        _4: K4,
+        handler: ValueHandler<T[K1][K2][K3][K4]>,
+    ): UnsubscribeFn;
+    handle<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2], K4 extends keyof T[K1][K2][K3]>(
+        keys: [K1, K2, K3, K4],
+        handler: ValueHandler<T[K1][K2][K3][K4]>,
+    ): UnsubscribeFn;
+    handle<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4]
+    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, handler: ValueHandler<T[K1][K2][K3][K4][K5]>): UnsubscribeFn;
+    handle<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4]
+    >(keys: [K1, K2, K3, K4, K5], handler: ValueHandler<T[K1][K2][K3][K4][K5]>): UnsubscribeFn;
+    handle<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4],
+        K6 extends keyof T[K1][K2][K3][K4][K5]
+    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, handler: ValueHandler<T[K1][K2][K3][K4][K5][K6]>): UnsubscribeFn;
+    handle<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4],
+        K6 extends keyof T[K1][K2][K3][K4][K5]
+    >(keys: [K1, K2, K3, K4, K5, K6], handler: ValueHandler<T[K1][K2][K3][K4][K5][K6]>): UnsubscribeFn;
+    handle<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4],
+        K6 extends keyof T[K1][K2][K3][K4][K5],
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, _7: K6, handler: ValueHandler<T[K1][K2][K3][K4][K5][K6][K7]>): UnsubscribeFn;
+    handle<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4],
+        K6 extends keyof T[K1][K2][K3][K4][K5],
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+    >(keys: [K1, K2, K3, K4, K5, K6, K7], handler: ValueHandler<T[K1][K2][K3][K4][K5][K6][K7]>): UnsubscribeFn;
+    handle(...args: any[]) {
+        const { keys, value: handler } = ReadonlyAbonDeep.parseKeyValueArgs(args);
+        validateListener(handler);
+        handler(this.get(keys as [keyof T]));
+        return NotifierDeep.get(this).subscribe(keys, handler);
     }
 
     use(): this;
@@ -347,6 +429,93 @@ export class ReadonlyAbonDeep<T extends object> {
 
         useClearedMemo(
             () => this.subscribe(keys as any, value),
+            (unsubscribe) => unsubscribe(),
+            [this, value, NotifierDeep.get(this).key(keys)],
+        );
+
+        return this;
+    }
+
+    useHandler(handler: ValueHandler<T>): this;
+    useHandler(keys: [], handler: ValueHandler<T>): this;
+    useHandler<K extends keyof T>(key: K, handler: ValueHandler<T[K]>): this;
+    useHandler<K extends keyof T>(keys: [K], handler: ValueHandler<T[K]>): this;
+    useHandler<K1 extends keyof T, K2 extends keyof T[K1]>(_1: K1, _2: K2, handler: ValueHandler<T[K1][K2]>): this;
+    useHandler<K1 extends keyof T, K2 extends keyof T[K1]>(keys: [K1, K2], handler: ValueHandler<T[K1][K2]>): this;
+    useHandler<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2]>(
+        _1: K1,
+        _2: K2,
+        _3: K3,
+        handler: ValueHandler<T[K1][K2][K3]>,
+    ): this;
+    useHandler<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2]>(
+        keys: [K1, K2, K3],
+        handler: ValueHandler<T[K1][K2][K3]>,
+    ): this;
+    useHandler<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2], K4 extends keyof T[K1][K2][K3]>(
+        _1: K1,
+        _2: K2,
+        _3: K3,
+        _4: K4,
+        handler: ValueHandler<T[K1][K2][K3][K4]>,
+    ): this;
+    useHandler<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2], K4 extends keyof T[K1][K2][K3]>(
+        keys: [K1, K2, K3, K4],
+        handler: ValueHandler<T[K1][K2][K3][K4]>,
+    ): this;
+    useHandler<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4]
+    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, handler: ValueHandler<T[K1][K2][K3][K4][K5]>): this;
+    useHandler<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4]
+    >(keys: [K1, K2, K3, K4, K5], handler: ValueHandler<T[K1][K2][K3][K4][K5]>): this;
+    useHandler<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4],
+        K6 extends keyof T[K1][K2][K3][K4][K5]
+    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, handler: ValueHandler<T[K1][K2][K3][K4][K5][K6]>): this;
+    useHandler<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4],
+        K6 extends keyof T[K1][K2][K3][K4][K5]
+    >(keys: [K1, K2, K3, K4, K5, K6], handler: ValueHandler<T[K1][K2][K3][K4][K5][K6]>): this;
+    useHandler<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4],
+        K6 extends keyof T[K1][K2][K3][K4][K5],
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, _7: K6, handler: ValueHandler<T[K1][K2][K3][K4][K5][K6][K7]>): this;
+    useHandler<
+        K1 extends keyof T,
+        K2 extends keyof T[K1],
+        K3 extends keyof T[K1][K2],
+        K4 extends keyof T[K1][K2][K3],
+        K5 extends keyof T[K1][K2][K3][K4],
+        K6 extends keyof T[K1][K2][K3][K4][K5],
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+    >(keys: [K1, K2, K3, K4, K5, K6, K7], handler: ValueHandler<T[K1][K2][K3][K4][K5][K6][K7]>): this;
+    useHandler(...args: any[]) {
+        const { keys, value } = ReadonlyAbonDeep.parseKeyValueArgs(args);
+
+        useClearedMemo(
+            () => this.handle(keys as any, value),
             (unsubscribe) => unsubscribe(),
             [this, value, NotifierDeep.get(this).key(keys)],
         );

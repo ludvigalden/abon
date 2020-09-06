@@ -7,8 +7,12 @@ import { ReadonlyAbonDeep } from "./readonly-abon-deep";
 
 /** Subscribe to, retrieve, and set deeply nested values. */
 export class AbonDeep<T extends object> extends ReadonlyAbonDeep<T> {
+    current: T;
+
     constructor(initial?: T) {
-        super(initial);
+        super();
+
+        this.current = (initial || {}) as T;
     }
 
     set(value: T): this;

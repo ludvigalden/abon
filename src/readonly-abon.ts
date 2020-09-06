@@ -1,18 +1,24 @@
 import { Notifier } from "./notifier";
-import { ChangeListener, UnsubscribeFn, Subscribeable } from "./types";
-import { useClearedMemo, useForceUpdate } from "./utils";
+import { ChangeListener, UnsubscribeFn, Subscribeable, ValueHandler } from "./types";
+import { useClearedMemo, useForceUpdate, validateListener } from "./utils";
 
 /** Retrieve and subscribe to a value. */
 export class ReadonlyAbon<T> implements Subscribeable<T> {
-    current: T;
+    readonly current: T;
 
-    constructor(initial?: T) {
-        this.current = initial as T;
+    constructor() {
         Notifier.define(this);
     }
 
     subscribe(listener: ChangeListener<T>): UnsubscribeFn {
+        validateListener(listener);
         return Notifier.get<T>(this).subscribe(listener);
+    }
+
+    handle(handler: ValueHandler<T>): UnsubscribeFn {
+        validateListener(handler);
+        handler(this.current);
+        return this.subscribe(handler);
     }
 
     use() {

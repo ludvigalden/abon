@@ -2,8 +2,8 @@ import isEqual from "lodash/isEqual";
 
 import { Abon } from "./abon";
 import { Notifier } from "./notifier";
-import { ChangeListener, UnsubscribeFn } from "./types";
-import { useForceUpdate, useClearedMemo } from "./utils";
+import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
+import { useForceUpdate, useClearedMemo, validateListener } from "./utils";
 import { PromiseDispatcher } from "./promise-dispatcher";
 
 /** Subscribe to, retrieve, and asynchronously update a value, where an action to set a value can be interrupted.
@@ -17,7 +17,14 @@ export class AbonAsync<T> extends PromiseDispatcher<T> implements Omit<Abon<T>, 
     }
 
     subscribe(listener: ChangeListener<T>): UnsubscribeFn {
+        validateListener(listener);
         return Notifier.get<T>(this).subscribe(listener);
+    }
+
+    handle(handler: ValueHandler<T>): UnsubscribeFn {
+        validateListener(handler);
+        handler(this.current);
+        return this.subscribe(handler);
     }
 
     use() {

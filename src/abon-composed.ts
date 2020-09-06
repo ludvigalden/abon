@@ -7,10 +7,14 @@ import { Notifier } from "./notifier";
 
 /** Subscribe to a value composed from multiple subscriptions. */
 export class AbonComposed<T> extends ReadonlyAbon<T> {
+    current: T;
+
     private __unsubscriber?: UnsubscribeFn;
 
     constructor(getter: () => T, subscriber: ComposedSubscriberFlex) {
-        super(getter());
+        super();
+
+        this.current = getter();
 
         const set = (value: T = getter()) => {
             if (!isEqual(this.current, value)) {
@@ -32,13 +36,18 @@ export class AbonComposed<T> extends ReadonlyAbon<T> {
 
 /** Subscribe to a value composed from multiple subscriptions. Also, update the subscriptions and how the value should be composed. */
 export class AbonComposedDynamic<T> extends ReadonlyAbon<T> {
+    current: T;
+
     private __unsubscriber?: UnsubscribeFn;
 
     protected getter: () => T;
     protected subscriber: ComposedSubscriberFlex;
 
     constructor(getter: () => T, subscriber: ComposedSubscriberFlex) {
-        super(getter());
+        super();
+
+        this.current = getter();
+
         this.getter = getter;
         this.subscriber = subscriber;
     }
