@@ -276,9 +276,9 @@ function PriceStatus() {
     const price = Abon.useRef<number>(() => 10);
     const fullPrice = Abon.useRef<number>(() => 100);
 
-    // `0.1` initially, then changes when `fullPrice` or `price` change
+    // `0.1` initially, then updates whenever `price` or `fullPrice` change
     const priceFraction = Abon.useComposedValue(
-        () => price.current / fullPrice,
+        () => price.current / fullPrice.current,
         (listener) => [fullPrice.subscribe(listener), price.subscribe(listener)],
         [price, fullPrice]
     );
@@ -293,7 +293,7 @@ function PriceStatus() {
 
 ### `Abon.resolve`
 
-Returns a promise resolved by the next value set to the provided `Abon`. You can also pass a function accepting a listener and returning a created subscription, which will resolve the promise with the value that is passed to the listener.
+Returns a promise resolved by the next value set to the provided Abon. You can also pass a function accepting a listener and returning a created subscription, which will resolve the promise with the value that is passed to the listener.
 
 ```tsx
 import { Abon } from "abon";

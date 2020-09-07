@@ -145,14 +145,7 @@ export class Abon<T> extends ReadonlyAbon<T> {
         return value.current;
     }
 
-    /**
-     * Creates an `Abon` based on a value that should be updated given a selection of subscriptions.
-     *
-     * If the instance should be read-only, you can define the instance as:
-     * ```
-     * const abon = Abon.from(...).readonly;
-     * abon.set(...) // TypeError: Property 'set' does not exist on type 'ReadonlyAbon'
-     * ``` */
+    /** Creates an `Abon` based on a value that should be updated given a selection of subscriptions. */
     static from<T>(
         getValue: () => T,
         listen: ComposedSubscriberFlex,
