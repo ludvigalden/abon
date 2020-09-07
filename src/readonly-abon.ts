@@ -42,4 +42,12 @@ export class ReadonlyAbon<T> implements Subscribeable<T> {
             [this, ...deps],
         );
     }
+
+    useHandler(handler: ValueHandler<T>, deps: readonly any[] = []) {
+        useClearedMemo(
+            () => this.handle(handler),
+            (unsubscribe) => unsubscribe(),
+            [this, ...deps],
+        );
+    }
 }
