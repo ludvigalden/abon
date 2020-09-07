@@ -27,9 +27,9 @@ export class AbonAsync<T> implements Omit<Abon<T>, "set" | "use"> {
         });
     }
 
+    async set(valueOrPromise: T | Promise<T>, onSet?: () => void | Promise<void>): Promise<this>;
     async set(promise: Promise<T>, onSet?: () => void | Promise<void>): Promise<this>;
     async set(value: T): Promise<this>;
-    async set(valueOrPromise: T | Promise<T>, onSet?: () => void | Promise<void>): Promise<this>;
     async set(valueOrPromise: T | Promise<T>, onSet?: () => void | Promise<void>): Promise<this> {
         if (typeof valueOrPromise === "object" && (valueOrPromise as Promise<T>)["then"]) {
             const dispatchId = Symbol();
@@ -62,7 +62,7 @@ export class AbonAsync<T> implements Omit<Abon<T>, "set" | "use"> {
         return this;
     }
 
-    async dispatch(promise: Promise<any>, onResolvedUninterrupted: () => void): Promise<this> {
+    async dispatch<T>(promise: Promise<T>, onUninterrupted: (resolved: T) => void | Promise<void>): Promise<this> {
         let dispatchId: symbol;
         const currentDispatchExists = Boolean(this.__dispatchId);
         if (currentDispatchExists) {
@@ -71,15 +71,15 @@ export class AbonAsync<T> implements Omit<Abon<T>, "set" | "use"> {
             dispatchId = Symbol();
             this.__dispatchId = dispatchId;
         }
-        await promise;
+        const resolved = await promise;
         if (this.__dispatchId === dispatchId || (!this.__dispatchId && this.__previousDispatchId === dispatchId)) {
             if (!currentDispatchExists) {
                 delete this.__dispatchId;
                 this.__previousDispatchId = dispatchId;
                 (this.__promiseNotifier as Notifier<undefined>).notify(undefined);
             }
-            if (typeof onResolvedUninterrupted === "function") {
-                onResolvedUninterrupted();
+            if (typeof onUninterrupted === "function") {
+                await onUninterrupted(resolved);
             }
         }
         return this;
