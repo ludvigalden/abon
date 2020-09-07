@@ -82,6 +82,14 @@ export class Abon<T> extends ReadonlyAbon<T> {
         );
     }
 
+    static useComposedHandler(handler: () => void, listen: ComposedSubscriberFlex, deps: readonly any[] = []) {
+        useClearedMemo(
+            () => this.composedHandler(handler, listen),
+            (unsubscribe) => unsubscribe(),
+            deps,
+        );
+    }
+
     static useComposedValue<T>(getValue: () => T, listen: ComposedSubscriberFlex, deps: readonly any[] = []): T {
         const listener = useForceUpdate();
         const value = React.useRef<T>();
