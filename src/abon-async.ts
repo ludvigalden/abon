@@ -27,10 +27,10 @@ export class AbonAsync<T> implements Omit<Abon<T>, "set" | "use"> {
         });
     }
 
-    async set(promise: Promise<T>, onResolvedUninterrupted?: () => void): Promise<this>;
+    async set(promise: Promise<T>, onSet?: () => void | Promise<void>): Promise<this>;
     async set(value: T): Promise<this>;
-    async set(valueOrPromise: T | Promise<T>, onResolvedUninterrupted?: () => void): Promise<this>;
-    async set(valueOrPromise: T | Promise<T>, onResolvedUninterrupted?: () => void): Promise<this> {
+    async set(valueOrPromise: T | Promise<T>, onSet?: () => void | Promise<void>): Promise<this>;
+    async set(valueOrPromise: T | Promise<T>, onSet?: () => void | Promise<void>): Promise<this> {
         if (typeof valueOrPromise === "object" && (valueOrPromise as Promise<T>)["then"]) {
             const dispatchId = Symbol();
             this.__dispatchId = dispatchId;
@@ -41,10 +41,12 @@ export class AbonAsync<T> implements Omit<Abon<T>, "set" | "use"> {
                     if (!isEqual(this.current, value)) {
                         this.current = value;
                         Notifier.get(this).notify(value);
-                    }
-                    (this.__promiseNotifier as Notifier<any>).notify(undefined);
-                    if (typeof onResolvedUninterrupted === "function") {
-                        onResolvedUninterrupted();
+                        (this.__promiseNotifier as Notifier<any>).notify(undefined);
+                        if (typeof onSet === "function") {
+                            return Promise.resolve(onSet()).then(() => this);
+                        }
+                    } else {
+                        (this.__promiseNotifier as Notifier<any>).notify(undefined);
                     }
                 }
                 return this;
