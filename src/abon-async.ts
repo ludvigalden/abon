@@ -27,8 +27,8 @@ export class AbonAsync<T> implements Omit<Abon<T>, "set" | "use"> {
         });
     }
 
-    async set(value: T): Promise<this>;
     async set(promise: Promise<T>, onResolvedUninterrupted?: () => void): Promise<this>;
+    async set(value: T): Promise<this>;
     async set(valueOrPromise: T | Promise<T>, onResolvedUninterrupted?: () => void): Promise<this>;
     async set(valueOrPromise: T | Promise<T>, onResolvedUninterrupted?: () => void): Promise<this> {
         if (typeof valueOrPromise === "object" && (valueOrPromise as Promise<T>)["then"]) {
