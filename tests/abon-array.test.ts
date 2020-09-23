@@ -1,4 +1,4 @@
-import { Abon, AbonArray } from "../src";
+import { AbonArray, resolve } from "../src";
 
 describe("AbonArray", () => {
     const item: T = { x: 0 };
@@ -64,7 +64,7 @@ describe("AbonArray", () => {
 
         promises.push(
             expect(
-                Abon.resolve<T>((listener) => array.subscribe((items) => listener(items[0]))),
+                resolve<T>((listener) => array.subscribe((items) => listener(items[0]))),
             ).resolves.toBe(item1),
         );
 
@@ -72,7 +72,7 @@ describe("AbonArray", () => {
 
         promises.push(
             expect(
-                Abon.resolve<T>((listener) => array.subscribe((items) => listener(items[0]))),
+                resolve<T>((listener) => array.subscribe((items) => listener(items[0]))),
             ).resolves.toBe(undefined),
         );
 

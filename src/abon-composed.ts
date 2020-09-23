@@ -1,9 +1,9 @@
 import isEqual from "lodash/isEqual";
 
-import { Abon } from "./abon";
 import { ReadonlyAbon } from "./readonly-abon";
 import { ComposedSubscriberFlex, UnsubscribeFn } from "./types";
 import { Notifier } from "./notifier";
+import { composedSubscription } from "./abon-utils";
 
 /** Subscribe to a value composed from multiple subscriptions. */
 export class AbonComposed<T> extends ReadonlyAbon<T> {
@@ -23,7 +23,7 @@ export class AbonComposed<T> extends ReadonlyAbon<T> {
             }
         };
 
-        this.__unsubscriber = Abon.composedSubscription(set, subscriber);
+        this.__unsubscriber = composedSubscription(set, subscriber);
     }
 
     protected unsubscribe() {
@@ -71,7 +71,7 @@ export class AbonComposedDynamic<T> extends ReadonlyAbon<T> {
 
     protected hydrateSubscriber() {
         this.unsubscribe();
-        this.__unsubscriber = Abon.composedSubscription(this.set.bind(this), this.subscriber);
+        this.__unsubscriber = composedSubscription(this.set.bind(this), this.subscriber);
     }
 
     protected unsubscribe() {

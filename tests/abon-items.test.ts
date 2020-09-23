@@ -1,4 +1,4 @@
-import { AbonItems, Abon } from "../src";
+import { AbonItems, resolve } from "../src";
 
 describe("AbonItems", () => {
     it("constructs", () => {
@@ -58,7 +58,7 @@ describe("AbonItems", () => {
 
         promises.push(
             expect(
-                Abon.resolve<number>((listener) => items.subscribe(20, "value", listener)),
+                resolve<number>((listener) => items.subscribe(20, "value", listener)),
             ).resolves.toBe(2),
         );
 
@@ -76,7 +76,7 @@ describe("AbonItems", () => {
 
         promises.push(
             expect(
-                Abon.resolve<number>((listener) => items.subscribe((_, values) => listener(values.length))),
+                resolve<number>((listener) => items.subscribe((_, values) => listener(values.length))),
             ).resolves.toBe(2),
         );
 

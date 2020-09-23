@@ -1,4 +1,4 @@
-import { Abon, AbonMap } from "../src";
+import { AbonMap, resolve } from "../src";
 
 describe("AbonMap", () => {
     it("constructs", () => {
@@ -12,7 +12,7 @@ describe("AbonMap", () => {
 
         const map = new AbonMap<string, number>();
 
-        promises.push(expect(Abon.resolve(map).then(() => map.size)).resolves.toBe(1));
+        promises.push(expect(resolve(map).then(() => map.size)).resolves.toBe(1));
 
         map.set("0", 0);
         map.delete("0");
@@ -27,13 +27,13 @@ describe("AbonMap", () => {
 
         map.set("X", 0);
 
-        promises.push(expect(Abon.resolve(map).then(() => map.get("X"))).resolves.toBe(1));
+        promises.push(expect(resolve(map).then(() => map.get("X"))).resolves.toBe(1));
 
         map.delete("$$$");
         map.set("X", 0);
         map.set("X", 1);
 
-        promises.push(expect(Abon.resolve(map).then(() => map.size)).resolves.toBe(0));
+        promises.push(expect(resolve(map).then(() => map.size)).resolves.toBe(0));
 
         map.set("X", 1);
         map.delete("$$");
@@ -49,7 +49,7 @@ describe("AbonMap", () => {
 
         deepMap.set("X", { Y: { Z: 0 } });
 
-        promises.push(expect(Abon.resolve(deepMap).then(() => deepMap.get("X"))).resolves.not.toMatchObject({ Y: { Z: 0 } }));
+        promises.push(expect(resolve(deepMap).then(() => deepMap.get("X"))).resolves.not.toMatchObject({ Y: { Z: 0 } }));
 
         deepMap.set("X", { Y: { Z: 0 } });
         deepMap.set("X", { Y: { Z: 1 } });

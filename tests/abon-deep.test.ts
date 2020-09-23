@@ -1,4 +1,4 @@
-import { AbonDeep, Abon } from "../src";
+import { AbonDeep, resolve } from "../src";
 
 describe("AbonDeep", () => {
     it("constructs", () => {
@@ -51,7 +51,7 @@ describe("AbonDeep", () => {
 
         promises.push(
             expect(
-                Abon.resolve<number>((listener) => value.subscribe("a", "b", "c", "d", "e", listener)),
+                resolve<number>((listener) => value.subscribe("a", "b", "c", "d", "e", listener)),
             ).resolves.toBe(1),
         );
 

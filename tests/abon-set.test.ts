@@ -1,4 +1,4 @@
-import { Abon, AbonSet } from "../src";
+import { AbonSet, resolve } from "../src";
 
 describe("AbonSet", () => {
     it("constructs", () => {
@@ -51,7 +51,7 @@ describe("AbonSet", () => {
 
         const set = new AbonSet<number>();
 
-        promises.push(expect(Abon.resolve(set).then(() => set.size)).resolves.toBe(1));
+        promises.push(expect(resolve(set).then(() => set.size)).resolves.toBe(1));
 
         set.add(1);
         set.delete(1);
@@ -65,11 +65,11 @@ describe("AbonSet", () => {
 
         const set = new AbonSet<number>();
 
-        promises.push(expect(Abon.resolve(set).then(() => set.size)).resolves.toBe(1));
+        promises.push(expect(resolve(set).then(() => set.size)).resolves.toBe(1));
 
         set.add(1);
 
-        promises.push(expect(Abon.resolve(set).then(() => set.size)).resolves.toBe(2));
+        promises.push(expect(resolve(set).then(() => set.size)).resolves.toBe(2));
 
         set.add(1);
         set.add(2);
@@ -85,11 +85,11 @@ describe("AbonSet", () => {
         set.add(1);
         set.add(2);
 
-        promises.push(expect(Abon.resolve(set).then(() => set.size)).resolves.toBe(4));
+        promises.push(expect(resolve(set).then(() => set.size)).resolves.toBe(4));
 
         set.modify([3, 4, 5, 6], [1, 2]);
 
-        promises.push(expect(Abon.resolve(set).then(() => set.size)).resolves.toBe(0));
+        promises.push(expect(resolve(set).then(() => set.size)).resolves.toBe(0));
 
         set.modify([3, 4, 5, 6], [1, 2]);
         set.modify(undefined, [3, 4, 5, 6]);
@@ -104,7 +104,7 @@ describe("AbonSet", () => {
 
         set.modify([3, 4, 5, 6], [1, 2]);
 
-        promises.push(expect(Abon.resolve(set).then(() => set.size)).resolves.toBe(0));
+        promises.push(expect(resolve(set).then(() => set.size)).resolves.toBe(0));
 
         set.clear();
 

@@ -6,6 +6,7 @@ import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
 import { useForceUpdate, validateListener } from "./utils";
 import { AbonSet } from "./abon-set";
 import { ReadonlyAbon } from "./readonly-abon";
+import { composedSubscription } from "./abon-utils";
 
 /** Inherits a value from children if the current value is undefined. */
 export class ReadonlyAbonInheritedUp<T> implements ReadonlyAbon<T> {
@@ -31,7 +32,7 @@ export class ReadonlyAbonInheritedUp<T> implements ReadonlyAbon<T> {
                 childrenSubscription();
             }
             setChildValue();
-            childrenSubscription = Abon.composedSubscription(setChildValue, (listener) =>
+            childrenSubscription = composedSubscription(setChildValue, (listener) =>
                 Array.from(this.children).map((child) => child.subscribe(listener)),
             );
         });
@@ -40,7 +41,7 @@ export class ReadonlyAbonInheritedUp<T> implements ReadonlyAbon<T> {
 
     subscribe(listener: ChangeListener<T>): UnsubscribeFn {
         validateListener(listener);
-        return Abon.composedSubscription(
+        return composedSubscription(
             () => listener(this.current),
             (composedListener) => [
                 Notifier.get<T>(this.value).subscribe(composedListener),

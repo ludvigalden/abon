@@ -1,4 +1,4 @@
-import { AbonEvent, Abon } from "../src";
+import { AbonEvent, resolve } from "../src";
 
 describe("AbonEvent", () => {
     it("notifies number", (done) => {
@@ -8,16 +8,16 @@ describe("AbonEvent", () => {
 
         promises.push(
             expect(
-                Abon.resolve<undefined>((listener) => event.subscribe(0, 1, listener)),
+                resolve<undefined>((listener) => event.subscribe(0, 1, listener)),
             ).resolves.toBe(undefined),
             expect(
-                Abon.resolve<number>((listener) => event.subscribe(0, listener)),
+                resolve<number>((listener) => event.subscribe(0, listener)),
             ).resolves.toBe(1),
             expect(
-                Abon.resolve<number>((listener) => event.subscribe(1, listener)),
+                resolve<number>((listener) => event.subscribe(1, listener)),
             ).resolves.toBe(2),
             expect(
-                Abon.resolve<number>((listener) => event.subscribe(listener)),
+                resolve<number>((listener) => event.subscribe(listener)),
             ).resolves.toBe(0),
         );
 
@@ -25,7 +25,7 @@ describe("AbonEvent", () => {
 
         promises.push(
             expect(
-                Abon.resolve<number>((listener) => event.subscribe(listener)),
+                resolve<number>((listener) => event.subscribe(listener)),
             ).resolves.toBe(1),
         );
 
@@ -43,16 +43,16 @@ describe("AbonEvent", () => {
 
         promises.push(
             expect(
-                Abon.resolve<undefined>((listener) => event.subscribe(object[0], object[1], listener)),
+                resolve<undefined>((listener) => event.subscribe(object[0], object[1], listener)),
             ).resolves.toStrictEqual(undefined),
             expect(
-                Abon.resolve<object>((listener) => event.subscribe(object[0], listener)),
+                resolve<object>((listener) => event.subscribe(object[0], listener)),
             ).resolves.toStrictEqual(object[1]),
             expect(
-                Abon.resolve<object>((listener) => event.subscribe(object[1], listener)),
+                resolve<object>((listener) => event.subscribe(object[1], listener)),
             ).resolves.toStrictEqual(object[2]),
             expect(
-                Abon.resolve<object>((listener) => event.subscribe(listener)),
+                resolve<object>((listener) => event.subscribe(listener)),
             ).resolves.toStrictEqual(object[0]),
         );
 
@@ -60,7 +60,7 @@ describe("AbonEvent", () => {
 
         promises.push(
             expect(
-                Abon.resolve<object>((listener) => event.subscribe(listener)),
+                resolve<object>((listener) => event.subscribe(listener)),
             ).resolves.toStrictEqual(object[1]),
         );
 
