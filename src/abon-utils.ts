@@ -27,7 +27,7 @@ export function hydratedSubscription<LT>(
         }
         unsubscribe = listen(listener);
     }
-    let unsubscribeHydrate: UnsubscribeFn | undefined = composedSubscription(hydrateSubscription, listenHydrate);
+    let unsubscribeHydrate: UnsubscribeFn | undefined = composedHandler(hydrateSubscription, listenHydrate);
     return function unsubscribeHydratedSubscription() {
         if (typeof unsubscribeHydrate === "function") {
             unsubscribeHydrate();
@@ -53,7 +53,7 @@ export function hydratedComposedSubscription(
         }
         unsubscribe = composedSubscription(listener, listen);
     }
-    let unsubscribeHydrate: UnsubscribeFn | undefined = composedSubscription(hydrateSubscription, listenHydrate);
+    let unsubscribeHydrate: UnsubscribeFn | undefined = composedHandler(hydrateSubscription, listenHydrate);
     return function unsubscribeHydratedSubscription() {
         if (typeof unsubscribeHydrate === "function") {
             unsubscribeHydrate();
