@@ -15,10 +15,72 @@ export function composedSubscription(listener: () => void, listen: ComposedSubsc
     return mergeUnsubscriber(listen(listener));
 }
 
+export function hydratedSubscription<LT>(
+    listener: LT,
+    listen: (listener: LT) => UnsubscribeFn,
+    listenHydrate: ComposedSubscriberFlex,
+): UnsubscribeFn {
+    validateListener(listener);
+    let unsubscribe: UnsubscribeFn | undefined;
+    function hydrateSubscription() {
+        if (typeof unsubscribe === "function") {
+            unsubscribe();
+        }
+        unsubscribe = listen(listener);
+    }
+    let unsubscribeHydrate: UnsubscribeFn | undefined = composedSubscription(hydrateSubscription, listenHydrate);
+    return function unsubscribeHydratedSubscription() {
+        if (typeof unsubscribeHydrate === "function") {
+            unsubscribeHydrate();
+            unsubscribeHydrate = undefined;
+        }
+        if (typeof unsubscribe === "function") {
+            unsubscribe();
+            unsubscribe = undefined;
+        }
+    };
+}
+
+export function hydratedComposedSubscription(
+    listener: () => void,
+    listen: ComposedSubscriberFlex,
+    listenHydrate: ComposedSubscriberFlex,
+): UnsubscribeFn {
+    validateListener(listener);
+    let unsubscribe: UnsubscribeFn | undefined;
+    function hydrateSubscription() {
+        if (typeof unsubscribe === "function") {
+            unsubscribe();
+        }
+        unsubscribe = composedSubscription(listener, listen);
+    }
+    let unsubscribeHydrate: UnsubscribeFn | undefined = composedSubscription(hydrateSubscription, listenHydrate);
+    return function unsubscribeHydratedSubscription() {
+        if (typeof unsubscribeHydrate === "function") {
+            unsubscribeHydrate();
+            unsubscribeHydrate = undefined;
+        }
+        if (typeof unsubscribe === "function") {
+            unsubscribe();
+            unsubscribe = undefined;
+        }
+    };
+}
+
 export function composedHandler(handler: () => void, listen: ComposedSubscriberFlex): UnsubscribeFn {
     validateListener(handler);
     handler();
     return composedSubscription(handler, listen);
+}
+
+export function hydratedComposedHandler(
+    handler: () => void,
+    listen: ComposedSubscriberFlex,
+    listenHydrate: ComposedSubscriberFlex,
+): UnsubscribeFn {
+    validateListener(handler);
+    handler();
+    return hydratedComposedSubscription(handler, listen, listenHydrate);
 }
 
 export function useComposedSubscription(listener: () => void, listen: ComposedSubscriberFlex, deps: readonly any[] = []) {
@@ -29,9 +91,48 @@ export function useComposedSubscription(listener: () => void, listen: ComposedSu
     );
 }
 
+export function useHydratedSubscription<LT>(
+    listener: LT,
+    listen: (listener: LT) => UnsubscribeFn,
+    listenHydrate: ComposedSubscriberFlex,
+    deps: readonly any[] = [],
+) {
+    useClearedMemo(
+        () => hydratedSubscription(listener, listen, listenHydrate),
+        (unsubscribe) => unsubscribe(),
+        deps,
+    );
+}
+
+export function useHydratedComposedSubscription(
+    listener: () => void,
+    listen: ComposedSubscriberFlex,
+    listenHydrate: ComposedSubscriberFlex,
+    deps: readonly any[] = [],
+) {
+    useClearedMemo(
+        () => hydratedComposedSubscription(listener, listen, listenHydrate),
+        (unsubscribe) => unsubscribe(),
+        deps,
+    );
+}
+
 export function useComposedHandler(handler: () => void, listen: ComposedSubscriberFlex, deps: readonly any[] = []) {
     useClearedMemo(
         () => composedHandler(handler, listen),
+        (unsubscribe) => unsubscribe(),
+        deps,
+    );
+}
+
+export function useHydratedComposedHandler(
+    handler: () => void,
+    listen: ComposedSubscriberFlex,
+    listenHydrate: ComposedSubscriberFlex,
+    deps: readonly any[] = [],
+) {
+    useClearedMemo(
+        () => hydratedComposedHandler(handler, listen, listenHydrate),
         (unsubscribe) => unsubscribe(),
         deps,
     );
