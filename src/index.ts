@@ -9,6 +9,7 @@ export * from "./abon-inherited-up";
 export * from "./abon-items";
 export * from "./abon-map";
 export * from "./abon-set";
+export * from "./abon-strict";
 export * from "./abon-utils";
 export * from "./notifier";
 export * from "./types";
