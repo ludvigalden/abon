@@ -1,7 +1,7 @@
 {
 	"name": "abon",
 	"description": "Flexible state management for React 🚀",
-	"version": "0.3.1",
+	"version": "0.3.2",
 	"license": "MIT",
 	"author": "Ludvig Aldén <ludvig@tifum.com>",
 	"repository": "ludvigalden/abon",
