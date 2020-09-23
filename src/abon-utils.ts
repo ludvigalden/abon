@@ -138,27 +138,49 @@ export function useHydratedComposedHandler(
 }
 
 export function useComposedValue<T>(getValue: () => T, listen: ComposedSubscriberFlex, deps: readonly any[] = []): T {
-    const listener = useForceUpdate();
+    const forceUpdate = useForceUpdate();
     const value = React.useRef<T>();
 
     useClearedMemo(
-        () => {
-            let nextValue = getValue();
+        () =>
+            composedHandler(() => {
+                const nextValue = getValue();
 
-            if (!isEqual(value.current, nextValue)) {
-                value.current = nextValue;
-                listener();
-            }
-
-            return composedSubscription(() => {
-                nextValue = getValue();
-
-                if (!isEqual(value, nextValue)) {
+                if (!isEqual(value.current, nextValue)) {
                     value.current = nextValue;
-                    listener();
+                    forceUpdate();
                 }
-            }, listen);
-        },
+            }, listen),
+        (unsubscribe) => unsubscribe(),
+        deps,
+    );
+
+    return value.current as T;
+}
+
+export function useHydratedComposedValue<T>(
+    getValue: () => T,
+    listen: ComposedSubscriberFlex,
+    listenHydrate: ComposedSubscriberFlex,
+    deps: readonly any[] = [],
+): T {
+    const forceUpdate = useForceUpdate();
+    const value = React.useRef<T>();
+
+    useClearedMemo(
+        () =>
+            hydratedComposedHandler(
+                () => {
+                    const nextValue = getValue();
+
+                    if (!isEqual(value.current, nextValue)) {
+                        value.current = nextValue;
+                        forceUpdate();
+                    }
+                },
+                listen,
+                listenHydrate,
+            ),
         (unsubscribe) => unsubscribe(),
         deps,
     );
@@ -171,7 +193,7 @@ export function useComposedValueAsync<T>(
     listen: ComposedSubscriberFlex,
     deps: readonly any[] = [],
 ): T | undefined {
-    const listener = useForceUpdate();
+    const forceUpdate = useForceUpdate();
     const value = React.useRef<T>();
     const getting = React.useRef<symbol>();
 
@@ -182,7 +204,7 @@ export function useComposedValueAsync<T>(
             getValue().then((nextValue) => {
                 if (getting.current === gettingMemo && !isEqual(value, nextValue)) {
                     value.current = nextValue;
-                    listener();
+                    forceUpdate();
                 }
             });
 
@@ -192,7 +214,7 @@ export function useComposedValueAsync<T>(
                 getValue().then((nextValue) => {
                     if (getting.current === gettingSubscription && !isEqual(value, nextValue)) {
                         value.current = nextValue;
-                        listener();
+                        forceUpdate();
                     }
                 });
             }, listen);
