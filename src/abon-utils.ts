@@ -5,7 +5,6 @@ import useClearedMemo from "use-cleared-memo";
 import { ComposedSubscriberFlexResult, UnsubscribeFn, ComposedSubscriberFlex, Subscribeable } from "./types";
 import { validateListener, useForceUpdate } from "./utils";
 import { ReadonlyAbon } from "./readonly-abon";
-import { Abon } from "./abon";
 import { AbonMap } from "./abon-map";
 import { AbonSet } from "./abon-set";
 import { AbonDeep } from "./abon-deep";
@@ -203,36 +202,6 @@ export function useComposedValueAsync<T>(
     );
 
     return value.current;
-}
-
-/** Creates an `Abon` based on a value that should be updated given a selection of subscriptions. */
-export function from<T>(
-    getValue: () => T,
-    listen: ComposedSubscriberFlex,
-    setUnsubscribe?: (unsubscribe: UnsubscribeFn) => void,
-): ReadonlyAbon<T>;
-export function from<T>(getValue: () => T, listen: ComposedSubscriberFlex, unsubscribeFns?: Set<Function>): ReadonlyAbon<T>;
-export function from<T>(getValue: () => T, listen: ComposedSubscriberFlex, unsubscribeFns?: Set<Function>): ReadonlyAbon<T>;
-export function from<T>(
-    getValue: () => T,
-    listen: ComposedSubscriberFlex,
-    unsubscribe?: Set<Function> | ((unsubscribe: UnsubscribeFn) => void),
-): ReadonlyAbon<T> {
-    const abon = new Abon(getValue());
-
-    const subscription = composedSubscription(function() {
-        abon.set(getValue());
-    }, listen);
-
-    if (unsubscribe) {
-        if (unsubscribe instanceof Set) {
-            unsubscribe.add(subscription);
-        } else {
-            unsubscribe(subscription);
-        }
-    }
-
-    return abon;
 }
 
 export function resolve<T>(listen: (listener: (value?: T) => void) => UnsubscribeFn): PromiseLike<void>;

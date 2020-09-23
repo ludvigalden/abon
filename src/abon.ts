@@ -3,8 +3,9 @@ import isEqual from "lodash/isEqual";
 import useClearedMemo from "use-cleared-memo";
 
 import { Notifier } from "./notifier";
-import { UnsubscribeFn } from "./types";
+import { UnsubscribeFn, ComposedSubscriberFlex } from "./types";
 import { ReadonlyAbon } from "./readonly-abon";
+import { composedSubscription } from "./abon-utils";
 
 /** Subscribe to, retrieve, and update a value. */
 export class Abon<T> extends ReadonlyAbon<T> {
@@ -35,6 +36,36 @@ export class Abon<T> extends ReadonlyAbon<T> {
 
     static useRef<T>(initial?: () => T, deps: readonly any[] = []): Abon<T> {
         return React.useMemo(() => new Abon((typeof initial === "function" ? initial() : undefined) as T), deps);
+    }
+
+    /** Creates an `Abon` based on a value that should be updated given a selection of subscriptions. */
+    static from<T>(
+        getValue: () => T,
+        listen: ComposedSubscriberFlex,
+        setUnsubscribe?: (unsubscribe: UnsubscribeFn) => void,
+    ): ReadonlyAbon<T>;
+    static from<T>(getValue: () => T, listen: ComposedSubscriberFlex, unsubscribeFns?: Set<Function>): ReadonlyAbon<T>;
+    static from<T>(getValue: () => T, listen: ComposedSubscriberFlex, unsubscribeFns?: Set<Function>): ReadonlyAbon<T>;
+    static from<T>(
+        getValue: () => T,
+        listen: ComposedSubscriberFlex,
+        unsubscribe?: Set<Function> | ((unsubscribe: UnsubscribeFn) => void),
+    ): ReadonlyAbon<T> {
+        const abon = new Abon(getValue());
+
+        const subscription = composedSubscription(function() {
+            abon.set(getValue());
+        }, listen);
+
+        if (unsubscribe) {
+            if (unsubscribe instanceof Set) {
+                unsubscribe.add(subscription);
+            } else {
+                unsubscribe(subscription);
+            }
+        }
+
+        return abon;
     }
 
     static useFrom<T>(listen: (listener: (value: T) => void) => UnsubscribeFn, initial?: () => T, deps: readonly any[] = []): Abon<T> {
