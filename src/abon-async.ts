@@ -31,7 +31,7 @@ export class AbonAsync<T> implements Omit<Abon<T>, "set" | "use"> {
     async set(promise: Promise<T>, onSet?: () => void | Promise<void>): Promise<this>;
     async set(value: T): Promise<this>;
     async set(valueOrPromise: T | Promise<T>, onSet?: () => void | Promise<void>): Promise<this> {
-        if (typeof valueOrPromise === "object" && (valueOrPromise as Promise<T>)["then"]) {
+        if (valueOrPromise && (valueOrPromise as Promise<T>)["then"]) {
             const dispatchId = Symbol();
             this.__dispatchId = dispatchId;
             return (valueOrPromise as Promise<T>).then((value) => {
