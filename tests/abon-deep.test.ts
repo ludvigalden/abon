@@ -45,6 +45,32 @@ describe("AbonDeep", () => {
     it("notifies", (done) => {
         const promises: Promise<any>[] = [];
 
+        const value = new AbonDeep<VH>();
+
+        value.set({ h: 1 });
+
+        promises.push(
+            expect(
+                resolve<VH>((listener) => value.subscribe(listener)),
+            ).resolves.toMatchObject({ h: 2 }),
+        );
+
+        value.set({ h: 2 });
+
+        promises.push(
+            expect(
+                resolve<VH>((listener) => value.subscribe(listener)),
+            ).resolves.toMatchObject({ h: 3 }),
+        );
+
+        value.set("h", 3);
+
+        Promise.all(promises).then(() => done());
+    }, 10);
+
+    it("notifies deep", (done) => {
+        const promises: Promise<any>[] = [];
+
         const value = new AbonDeep<V>();
 
         value.set("a", "b", "c", { d: { e: 0 }, f: 0 });
@@ -61,8 +87,11 @@ describe("AbonDeep", () => {
     }, 10);
 });
 
-interface V {
+interface VH {
+    h: number;
+}
+
+interface V extends VH {
     a: { b: { c: { d: { e: number }; f: number }; g: number }; h: number };
     i: { j: number };
-    h: number;
 }

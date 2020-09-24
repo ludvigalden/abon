@@ -112,7 +112,7 @@ export class AbonDeep<T extends object> extends ReadonlyAbonDeep<T> {
         Array.from(matches.entries()).forEach(([key, notifier]) => {
             if (!key.length) {
                 // we know this value is not equal
-                notifier.notify(value, ...this.rootSubscriptionArgs);
+                notifier.notify(this.current, ...this.rootSubscriptionArgs);
             } else if (key.length === keys.length && isEqual(key, keys)) {
                 // we know this value is not equal
                 notifier.notify(value);
