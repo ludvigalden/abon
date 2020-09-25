@@ -78,8 +78,25 @@ export function hydratedComposedHandler(
     listenHydrate: ComposedSubscriberFlex,
 ): UnsubscribeFn {
     validateListener(handler);
-    handler();
-    return hydratedComposedSubscription(handler, listen, listenHydrate);
+    let unsubscribe: UnsubscribeFn | undefined;
+    function hydrateSubscription() {
+        if (typeof unsubscribe === "function") {
+            unsubscribe();
+        }
+        unsubscribe = composedSubscription(handler, listen);
+        handler();
+    }
+    let unsubscribeHydrate: UnsubscribeFn | undefined = composedHandler(hydrateSubscription, listenHydrate);
+    return function unsubscribeHydratedSubscription() {
+        if (typeof unsubscribeHydrate === "function") {
+            unsubscribeHydrate();
+            unsubscribeHydrate = undefined;
+        }
+        if (typeof unsubscribe === "function") {
+            unsubscribe();
+            unsubscribe = undefined;
+        }
+    };
 }
 
 export function useComposedSubscription(listener: () => void, listen: ComposedSubscriberFlex, deps: readonly any[] = []) {
