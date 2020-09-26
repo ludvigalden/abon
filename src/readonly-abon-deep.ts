@@ -350,21 +350,32 @@ export class ReadonlyAbonDeep<T extends object> {
         }
     }
 
-    useSubscription(listener: ChangeListener<T>): this;
-    useSubscription(keys: [], listener: ChangeListener<T>): this;
-    useSubscription<K extends keyof T>(key: K, listener: ChangeListener<T[K]>): this;
-    useSubscription<K extends keyof T>(keys: [K], listener: ChangeListener<T[K]>): this;
-    useSubscription<K1 extends keyof T, K2 extends keyof T[K1]>(_1: K1, _2: K2, listener: ChangeListener<T[K1][K2]>): this;
-    useSubscription<K1 extends keyof T, K2 extends keyof T[K1]>(keys: [K1, K2], listener: ChangeListener<T[K1][K2]>): this;
+    useSubscription(listener: ChangeListener<T>, deps?: readonly any[]): this;
+    useSubscription(keys: [], listener: ChangeListener<T>, deps?: readonly any[]): this;
+    useSubscription<K extends keyof T>(key: K, listener: ChangeListener<T[K]>, deps?: readonly any[]): this;
+    useSubscription<K extends keyof T>(keys: [K], listener: ChangeListener<T[K]>, deps?: readonly any[]): this;
+    useSubscription<K1 extends keyof T, K2 extends keyof T[K1]>(
+        _1: K1,
+        _2: K2,
+        listener: ChangeListener<T[K1][K2]>,
+        deps?: readonly any[],
+    ): this;
+    useSubscription<K1 extends keyof T, K2 extends keyof T[K1]>(
+        keys: [K1, K2],
+        listener: ChangeListener<T[K1][K2]>,
+        deps?: readonly any[],
+    ): this;
     useSubscription<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2]>(
         _1: K1,
         _2: K2,
         _3: K3,
         listener: ChangeListener<T[K1][K2][K3]>,
+        deps?: readonly any[],
     ): this;
     useSubscription<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2]>(
         keys: [K1, K2, K3],
         listener: ChangeListener<T[K1][K2][K3]>,
+        deps?: readonly any[],
     ): this;
     useSubscription<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2], K4 extends keyof T[K1][K2][K3]>(
         _1: K1,
@@ -372,6 +383,7 @@ export class ReadonlyAbonDeep<T extends object> {
         _3: K3,
         _4: K4,
         listener: ChangeListener<T[K1][K2][K3][K4]>,
+        deps?: readonly any[],
     ): this;
     useSubscription<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2], K4 extends keyof T[K1][K2][K3]>(
         keys: [K1, K2, K3, K4],
@@ -383,14 +395,14 @@ export class ReadonlyAbonDeep<T extends object> {
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4]
-    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, listener: ChangeListener<T[K1][K2][K3][K4][K5]>): this;
+    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, listener: ChangeListener<T[K1][K2][K3][K4][K5]>, deps?: readonly any[]): this;
     useSubscription<
         K1 extends keyof T,
         K2 extends keyof T[K1],
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4]
-    >(keys: [K1, K2, K3, K4, K5], listener: ChangeListener<T[K1][K2][K3][K4][K5]>): this;
+    >(keys: [K1, K2, K3, K4, K5], listener: ChangeListener<T[K1][K2][K3][K4][K5]>, deps?: readonly any[]): this;
     useSubscription<
         K1 extends keyof T,
         K2 extends keyof T[K1],
@@ -398,7 +410,7 @@ export class ReadonlyAbonDeep<T extends object> {
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5]
-    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, listener: ChangeListener<T[K1][K2][K3][K4][K5][K6]>): this;
+    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, listener: ChangeListener<T[K1][K2][K3][K4][K5][K6]>, deps?: readonly any[]): this;
     useSubscription<
         K1 extends keyof T,
         K2 extends keyof T[K1],
@@ -406,7 +418,7 @@ export class ReadonlyAbonDeep<T extends object> {
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5]
-    >(keys: [K1, K2, K3, K4, K5, K6], listener: ChangeListener<T[K1][K2][K3][K4][K5][K6]>): this;
+    >(keys: [K1, K2, K3, K4, K5, K6], listener: ChangeListener<T[K1][K2][K3][K4][K5][K6]>, deps?: readonly any[]): this;
     useSubscription<
         K1 extends keyof T,
         K2 extends keyof T[K1],
@@ -415,7 +427,17 @@ export class ReadonlyAbonDeep<T extends object> {
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
         K7 extends keyof T[K1][K2][K3][K4][K5][K6]
-    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, _7: K6, listener: ChangeListener<T[K1][K2][K3][K4][K5][K6][K7]>): this;
+    >(
+        _1: K1,
+        _2: K2,
+        _3: K3,
+        _4: K4,
+        _5: K5,
+        _6: K6,
+        _7: K6,
+        listener: ChangeListener<T[K1][K2][K3][K4][K5][K6][K7]>,
+        deps?: readonly any[],
+    ): this;
     useSubscription<
         K1 extends keyof T,
         K2 extends keyof T[K1],
@@ -424,34 +446,40 @@ export class ReadonlyAbonDeep<T extends object> {
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
         K7 extends keyof T[K1][K2][K3][K4][K5][K6]
-    >(keys: [K1, K2, K3, K4, K5, K6, K7], listener: ChangeListener<T[K1][K2][K3][K4][K5][K6][K7]>): this;
+    >(keys: [K1, K2, K3, K4, K5, K6, K7], listener: ChangeListener<T[K1][K2][K3][K4][K5][K6][K7]>, deps?: readonly any[]): this;
     useSubscription(...args: any[]) {
-        const { keys, value } = ReadonlyAbonDeep.parseKeyValueArgs(args);
+        let deps: readonly any[] = [];
+        if (Array.isArray(args[args.length - 1])) {
+            deps = args.pop();
+        }
+        const { keys, value: listener } = ReadonlyAbonDeep.parseKeyValueArgs(args);
 
         useClearedMemo(
-            () => this.subscribe(keys as any, value),
+            () => this.subscribe(keys as any, listener),
             (unsubscribe) => unsubscribe(),
-            [this, value, NotifierDeep.get(this).key(keys)],
+            [this, listener, NotifierDeep.get(this).key(keys), ...deps],
         );
 
         return this;
     }
 
-    useHandler(handler: ValueHandler<T>): this;
-    useHandler(keys: [], handler: ValueHandler<T>): this;
-    useHandler<K extends keyof T>(key: K, handler: ValueHandler<T[K]>): this;
-    useHandler<K extends keyof T>(keys: [K], handler: ValueHandler<T[K]>): this;
-    useHandler<K1 extends keyof T, K2 extends keyof T[K1]>(_1: K1, _2: K2, handler: ValueHandler<T[K1][K2]>): this;
-    useHandler<K1 extends keyof T, K2 extends keyof T[K1]>(keys: [K1, K2], handler: ValueHandler<T[K1][K2]>): this;
+    useHandler(handler: ValueHandler<T>, deps?: readonly any[]): this;
+    useHandler(keys: [], handler: ValueHandler<T>, deps?: readonly any[]): this;
+    useHandler<K extends keyof T>(key: K, handler: ValueHandler<T[K]>, deps?: readonly any[]): this;
+    useHandler<K extends keyof T>(keys: [K], handler: ValueHandler<T[K]>, deps?: readonly any[]): this;
+    useHandler<K1 extends keyof T, K2 extends keyof T[K1]>(_1: K1, _2: K2, handler: ValueHandler<T[K1][K2]>, deps?: readonly any[]): this;
+    useHandler<K1 extends keyof T, K2 extends keyof T[K1]>(keys: [K1, K2], handler: ValueHandler<T[K1][K2]>, deps?: readonly any[]): this;
     useHandler<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2]>(
         _1: K1,
         _2: K2,
         _3: K3,
         handler: ValueHandler<T[K1][K2][K3]>,
+        deps?: readonly any[],
     ): this;
     useHandler<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2]>(
         keys: [K1, K2, K3],
         handler: ValueHandler<T[K1][K2][K3]>,
+        deps?: readonly any[],
     ): this;
     useHandler<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2], K4 extends keyof T[K1][K2][K3]>(
         _1: K1,
@@ -459,10 +487,12 @@ export class ReadonlyAbonDeep<T extends object> {
         _3: K3,
         _4: K4,
         handler: ValueHandler<T[K1][K2][K3][K4]>,
+        deps?: readonly any[],
     ): this;
     useHandler<K1 extends keyof T, K2 extends keyof T[K1], K3 extends keyof T[K1][K2], K4 extends keyof T[K1][K2][K3]>(
         keys: [K1, K2, K3, K4],
         handler: ValueHandler<T[K1][K2][K3][K4]>,
+        deps?: readonly any[],
     ): this;
     useHandler<
         K1 extends keyof T,
@@ -470,14 +500,14 @@ export class ReadonlyAbonDeep<T extends object> {
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4]
-    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, handler: ValueHandler<T[K1][K2][K3][K4][K5]>): this;
+    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, handler: ValueHandler<T[K1][K2][K3][K4][K5]>, deps?: readonly any[]): this;
     useHandler<
         K1 extends keyof T,
         K2 extends keyof T[K1],
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4]
-    >(keys: [K1, K2, K3, K4, K5], handler: ValueHandler<T[K1][K2][K3][K4][K5]>): this;
+    >(keys: [K1, K2, K3, K4, K5], handler: ValueHandler<T[K1][K2][K3][K4][K5]>, deps?: readonly any[]): this;
     useHandler<
         K1 extends keyof T,
         K2 extends keyof T[K1],
@@ -485,7 +515,7 @@ export class ReadonlyAbonDeep<T extends object> {
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5]
-    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, handler: ValueHandler<T[K1][K2][K3][K4][K5][K6]>): this;
+    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, handler: ValueHandler<T[K1][K2][K3][K4][K5][K6]>, deps?: readonly any[]): this;
     useHandler<
         K1 extends keyof T,
         K2 extends keyof T[K1],
@@ -493,7 +523,7 @@ export class ReadonlyAbonDeep<T extends object> {
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5]
-    >(keys: [K1, K2, K3, K4, K5, K6], handler: ValueHandler<T[K1][K2][K3][K4][K5][K6]>): this;
+    >(keys: [K1, K2, K3, K4, K5, K6], handler: ValueHandler<T[K1][K2][K3][K4][K5][K6]>, deps?: readonly any[]): this;
     useHandler<
         K1 extends keyof T,
         K2 extends keyof T[K1],
@@ -502,7 +532,17 @@ export class ReadonlyAbonDeep<T extends object> {
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
         K7 extends keyof T[K1][K2][K3][K4][K5][K6]
-    >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, _7: K6, handler: ValueHandler<T[K1][K2][K3][K4][K5][K6][K7]>): this;
+    >(
+        _1: K1,
+        _2: K2,
+        _3: K3,
+        _4: K4,
+        _5: K5,
+        _6: K6,
+        _7: K6,
+        handler: ValueHandler<T[K1][K2][K3][K4][K5][K6][K7]>,
+        deps?: readonly any[],
+    ): this;
     useHandler<
         K1 extends keyof T,
         K2 extends keyof T[K1],
@@ -511,14 +551,18 @@ export class ReadonlyAbonDeep<T extends object> {
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
         K7 extends keyof T[K1][K2][K3][K4][K5][K6]
-    >(keys: [K1, K2, K3, K4, K5, K6, K7], handler: ValueHandler<T[K1][K2][K3][K4][K5][K6][K7]>): this;
+    >(keys: [K1, K2, K3, K4, K5, K6, K7], handler: ValueHandler<T[K1][K2][K3][K4][K5][K6][K7]>, deps?: readonly any[]): this;
     useHandler(...args: any[]) {
-        const { keys, value } = ReadonlyAbonDeep.parseKeyValueArgs(args);
+        let deps: readonly any[] = [];
+        if (Array.isArray(args[args.length - 1])) {
+            deps = args.pop();
+        }
+        const { keys, value: handler } = ReadonlyAbonDeep.parseKeyValueArgs(args);
 
         useClearedMemo(
-            () => this.handle(keys as any, value),
+            () => this.handle(keys as any, handler),
             (unsubscribe) => unsubscribe(),
-            [this, value, NotifierDeep.get(this).key(keys)],
+            [this, handler, NotifierDeep.get(this).key(keys), ...deps],
         );
 
         return this;
