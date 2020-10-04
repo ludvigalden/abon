@@ -4,7 +4,7 @@ import useClearedMemo from "use-cleared-memo";
 
 import { NotifierDeep } from "./notifier";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
-import { useForceUpdate, validateListener } from "./utils";
+import { useMountedForceUpdate, validateListener } from "./utils";
 
 /** Subscribe to and set the entries of a `Map`. */
 export class AbonMap<K, V> extends Map<K, V> {
@@ -154,7 +154,7 @@ export class AbonMap<K, V> extends Map<K, V> {
     use(key: K): V | undefined;
     use(): this;
     use(key?: K): V | undefined | this {
-        const listener = useForceUpdate();
+        const listener = useMountedForceUpdate();
 
         useClearedMemo(
             () => (key != null ? this.subscribe(key, listener) : this.subscribe(listener)),

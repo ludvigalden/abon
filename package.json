@@ -43,7 +43,7 @@
 	},
 	"dependencies": {
 		"lodash": "*",
-		"use-cleared-memo": "0.1.0"
+		"use-cleared-memo": "1.0.0"
 	},
 	"peerDependencies": {
 		"react": ">=16.8.0"

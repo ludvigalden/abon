@@ -5,7 +5,7 @@ import { PropertyPath } from "lodash";
 
 import { NotifierDeep } from "./notifier";
 import { ChangeListener, ValueHandler, UnsubscribeFn } from "./types";
-import { useForceUpdate, validateListener } from "./utils";
+import { useMountedForceUpdate, validateListener } from "./utils";
 
 /** Retrieve and subscribe to deeply nested values. */
 export class ReadonlyAbonDeep<T extends object> {
@@ -320,7 +320,7 @@ export class ReadonlyAbonDeep<T extends object> {
     >(keys: [K1, K2, K3, K4, K5, K6, K7]): T[K1][K2][K3][K4][K5][K6][K7];
     use(...args: any[]): any {
         const keys = ReadonlyAbonDeep.parseKeyArgs(args);
-        const listener = useForceUpdate();
+        const listener = useMountedForceUpdate();
 
         if (!keys.length) {
             useClearedMemo(

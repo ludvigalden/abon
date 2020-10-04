@@ -3,7 +3,7 @@ import isEqual from "lodash/isEqual";
 import useClearedMemo from "use-cleared-memo";
 
 import { ComposedSubscriberFlexResult, UnsubscribeFn, ComposedSubscriberFlex, Subscribeable } from "./types";
-import { validateListener, useForceUpdate } from "./utils";
+import { validateListener, useMountedForceUpdate } from "./utils";
 import { ReadonlyAbon } from "./readonly-abon";
 import { AbonMap } from "./abon-map";
 import { AbonSet } from "./abon-set";
@@ -155,7 +155,7 @@ export function useHydratedComposedHandler(
 }
 
 export function useComposedValue<T>(getValue: () => T, listen: ComposedSubscriberFlex, deps: readonly any[] = []): T {
-    const forceUpdate = useForceUpdate();
+    const forceUpdate = useMountedForceUpdate();
     const value = React.useRef<T>();
 
     useClearedMemo(
@@ -181,7 +181,7 @@ export function useHydratedComposedValue<T>(
     listenHydrate: ComposedSubscriberFlex,
     deps: readonly any[] = [],
 ): T {
-    const forceUpdate = useForceUpdate();
+    const forceUpdate = useMountedForceUpdate();
     const value = React.useRef<T>();
 
     useClearedMemo(
@@ -210,7 +210,7 @@ export function useComposedValueAsync<T>(
     listen: ComposedSubscriberFlex,
     deps: readonly any[] = [],
 ): T | undefined {
-    const forceUpdate = useForceUpdate();
+    const forceUpdate = useMountedForceUpdate();
     const value = React.useRef<T>();
     const getting = React.useRef<symbol>();
 

@@ -3,7 +3,7 @@ import useClearedMemo from "use-cleared-memo";
 import { Abon } from "./abon";
 import { Notifier } from "./notifier";
 import { ChangeListener, ValueHandler, UnsubscribeFn } from "./types";
-import { useForceUpdate, validateListener } from "./utils";
+import { useMountedForceUpdate, validateListener } from "./utils";
 import { ReadonlyAbon } from "./readonly-abon";
 import { AbonInheritedDown } from "./abon-inherited-down";
 import { composedSubscription } from "./abon-utils";
@@ -37,7 +37,7 @@ export class ReadonlyAbonInheritedDown<T> implements ReadonlyAbon<T> {
     }
 
     use() {
-        const listener = useForceUpdate();
+        const listener = useMountedForceUpdate();
 
         useClearedMemo(
             () => this.subscribe(listener),
