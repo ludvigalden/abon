@@ -1,12 +1,12 @@
-import useClearedMemo from "use-cleared-memo";
+import { useClearedMemo } from "use-cleared-memo";
 
 import { Abon } from "./abon";
+import { AbonSet } from "./abon-set";
+import { composedSubscription } from "./abon-utils";
 import { Notifier } from "./notifier";
+import { ReadonlyAbon } from "./readonly-abon";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
 import { useMountedForceUpdate, validateListener } from "./utils";
-import { AbonSet } from "./abon-set";
-import { ReadonlyAbon } from "./readonly-abon";
-import { composedSubscription } from "./abon-utils";
 
 /** Inherits a value from children if the current value is undefined. */
 export class ReadonlyAbonInheritedUp<T> implements ReadonlyAbon<T> {

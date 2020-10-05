@@ -1,7 +1,7 @@
-import React from "react";
 import isEqual from "lodash/isEqual";
-import set from "lodash/set";
 import merge from "lodash/merge";
+import set from "lodash/set";
+import React from "react";
 
 import { NotifierDeep } from "./notifier";
 import { ReadonlyAbonDeep } from "./readonly-abon-deep";

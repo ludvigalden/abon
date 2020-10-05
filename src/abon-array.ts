@@ -1,6 +1,6 @@
-import React from "react";
 import isEqual from "lodash/isEqual";
-import useClearedMemo from "use-cleared-memo";
+import React from "react";
+import { useClearedMemo } from "use-cleared-memo";
 
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";

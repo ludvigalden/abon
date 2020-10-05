@@ -1,11 +1,11 @@
 import React from "react";
-import useClearedMemo from "use-cleared-memo";
+import { useClearedMemo } from "use-cleared-memo";
 
-import { Notifier } from "./notifier";
-import { UnsubscribeFn, ComposedSubscriberFlex } from "./types";
-import { ReadonlyAbon } from "./readonly-abon";
 import { Abon } from "./abon";
 import { composedSubscription } from "./abon-utils";
+import { Notifier } from "./notifier";
+import { ReadonlyAbon } from "./readonly-abon";
+import { ComposedSubscriberFlex, UnsubscribeFn } from "./types";
 
 /** Subscribe to, retrieve, and update a value. Equality checks are strict. */
 export class AbonStrict<T> extends ReadonlyAbon<T> implements Abon<T> {
@@ -53,7 +53,7 @@ export class AbonStrict<T> extends ReadonlyAbon<T> implements Abon<T> {
     ): ReadonlyAbon<T> {
         const abon = new AbonStrict(getValue());
 
-        const subscription = composedSubscription(function() {
+        const subscription = composedSubscription(function () {
             abon.set(getValue());
         }, listen);
 

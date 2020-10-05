@@ -1,10 +1,10 @@
-import useClearedMemo from "use-cleared-memo";
-import React from "react";
-import get from "lodash/get";
 import { PropertyPath } from "lodash";
+import get from "lodash/get";
+import React from "react";
+import { useClearedMemo } from "use-cleared-memo";
 
 import { NotifierDeep } from "./notifier";
-import { ChangeListener, ValueHandler, UnsubscribeFn } from "./types";
+import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
 import { useMountedForceUpdate, validateListener } from "./utils";
 
 /** Retrieve and subscribe to deeply nested values. */

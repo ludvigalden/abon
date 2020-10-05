@@ -1,9 +1,9 @@
 import isEqual from "lodash/isEqual";
 
+import { composedSubscription } from "./abon-utils";
+import { Notifier } from "./notifier";
 import { ReadonlyAbon } from "./readonly-abon";
 import { ComposedSubscriberFlex, UnsubscribeFn } from "./types";
-import { Notifier } from "./notifier";
-import { composedSubscription } from "./abon-utils";
 
 /** Subscribe to a value composed from multiple subscriptions. */
 export class AbonComposed<T> extends ReadonlyAbon<T> {

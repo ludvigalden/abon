@@ -1,13 +1,13 @@
-import React from "react";
 import isEqual from "lodash/isEqual";
-import useClearedMemo from "use-cleared-memo";
+import React from "react";
+import { useClearedMemo } from "use-cleared-memo";
 
-import { ComposedSubscriberFlexResult, UnsubscribeFn, ComposedSubscriberFlex, Subscribeable } from "./types";
-import { validateListener, useMountedForceUpdate } from "./utils";
-import { ReadonlyAbon } from "./readonly-abon";
+import { AbonDeep } from "./abon-deep";
 import { AbonMap } from "./abon-map";
 import { AbonSet } from "./abon-set";
-import { AbonDeep } from "./abon-deep";
+import { ReadonlyAbon } from "./readonly-abon";
+import { ComposedSubscriberFlex, ComposedSubscriberFlexResult, Subscribeable, UnsubscribeFn } from "./types";
+import { useMountedForceUpdate, validateListener } from "./utils";
 
 export function composedSubscription(listener: () => void, listen: ComposedSubscriberFlex): UnsubscribeFn {
     validateListener(listener);
@@ -261,7 +261,7 @@ export function resolve(arg: any): PromiseLike<any> {
     let setValue: (value?: any) => any;
     let resolved: any = INITIAL_VALUE;
 
-    const unsubscribe = listen(function(value) {
+    const unsubscribe = listen(function (value) {
         if (typeof unsubscribe === "function") {
             unsubscribe();
         }

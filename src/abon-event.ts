@@ -1,7 +1,7 @@
 import React from "react";
 
-import { ReadonlyAbonEvent } from "./readonly-abon-event";
 import { Notifier } from "./notifier";
+import { ReadonlyAbonEvent } from "./readonly-abon-event";
 
 /** Notify and subscribe to events and payloads. */
 export class AbonEvent<E = undefined, P = undefined> extends ReadonlyAbonEvent<E, P> {

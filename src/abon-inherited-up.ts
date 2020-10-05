@@ -1,5 +1,5 @@
-import React from "react";
 import isEqual from "lodash/isEqual";
+import React from "react";
 
 import { Abon } from "./abon";
 import { Notifier } from "./notifier";

@@ -1,7 +1,7 @@
-import useClearedMemo from "use-cleared-memo";
+import { useClearedMemo } from "use-cleared-memo";
 
 import { Notifier } from "./notifier";
-import { ChangeListener, UnsubscribeFn, Subscribeable, ValueHandler } from "./types";
+import { ChangeListener, Subscribeable, UnsubscribeFn, ValueHandler } from "./types";
 import { useMountedForceUpdate, validateListener } from "./utils";
 
 /** Retrieve and subscribe to a value. */

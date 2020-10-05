@@ -1,7 +1,7 @@
-import useClearedMemo from "use-cleared-memo";
+import { useClearedMemo } from "use-cleared-memo";
 
-import { Listener, EventListener, EventPayloadListener, UnsubscribeFn } from "./types";
 import { Notifier } from "./notifier";
+import { EventListener, EventPayloadListener, Listener, UnsubscribeFn } from "./types";
 import { validateListener } from "./utils";
 
 /** Subscribe to events and payloads. */

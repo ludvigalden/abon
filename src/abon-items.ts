@@ -1,13 +1,14 @@
-import React from "react";
 import isEqual from "lodash/isEqual";
 import uniqBy from "lodash/uniqBy";
+import React from "react";
 
 import { AbonArray } from "./abon-array";
 import { AbonDeep } from "./abon-deep";
-import { ChangeListener, UnsubscribeFn, ItemRecord, ItemRecordKey, ItemsChangeListener } from "./types";
+import { ChangeListener, ItemRecord, ItemRecordKey, ItemsChangeListener, UnsubscribeFn } from "./types";
 
 /** Subscribe to and update an ordered list of identifiable objects. */
-export class AbonItems<T extends object, I extends keyof T> extends AbonDeep<ItemRecord<T, I>>
+export class AbonItems<T extends object, I extends keyof T>
+    extends AbonDeep<ItemRecord<T, I>>
     implements
         Pick<
             Array<T>,
