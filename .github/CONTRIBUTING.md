@@ -1,4 +1,4 @@
-# Contributing to abon
+# Contributing to Abon
 
 1. Fork this repository to your own GitHub account and then clone it to your local device.
 2. Install the dependencies: `yarn install`
