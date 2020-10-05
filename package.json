@@ -1,7 +1,7 @@
 {
 	"name": "abon",
 	"description": "Flexible state management for React 🚀",
-	"version": "0.4.0",
+	"version": "0.5.0",
 	"license": "MIT",
 	"author": "Ludvig Aldén <ludvig@tifum.com>",
 	"repository": "ludvigalden/abon",
@@ -44,8 +44,8 @@
 		"react": ">=16.8.0"
 	},
 	"devDependencies": {
-		"@types/react": "^16.9.23",
 		"@types/lodash": "^4.14.161",
+		"@types/react": "^16.9.23",
 		"@typescript-eslint/eslint-plugin": "4.2.0",
 		"@typescript-eslint/parser": "4.2.0",
 		"babel-eslint": "10.1.0",
