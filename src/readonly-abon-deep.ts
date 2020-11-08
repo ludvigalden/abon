@@ -1,11 +1,10 @@
 import { PropertyPath } from "lodash";
 import get from "lodash/get";
-import React from "react";
 import { useClearedMemo } from "use-cleared-memo";
 
 import { NotifierDeep } from "./notifier";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
-import { useMountedForceUpdate, validateListener } from "./utils";
+import { useClearedValueSubscription, useMountedForceUpdate, validateListener } from "./utils";
 
 /** Retrieve and subscribe to deeply nested values. */
 export class ReadonlyAbonDeep<T extends object> {
@@ -323,27 +322,22 @@ export class ReadonlyAbonDeep<T extends object> {
         const listener = useMountedForceUpdate();
 
         if (!keys.length) {
-            useClearedMemo(
-                () => this.subscribe(listener),
-                (unsubscribe) => unsubscribe(),
+            useClearedValueSubscription(
+                this.current,
+                () => this.current,
+                listener,
+                (listener) => this.subscribe(listener),
                 [this, listener],
             );
 
             return this;
         } else {
-            const value = React.useRef<T>();
-
-            useClearedMemo(
-                () => {
-                    value.current = this.get(keys as any);
-
-                    return this.subscribe(keys as any, (nextValue) => {
-                        value.current = nextValue;
-                        listener();
-                    });
-                },
-                (unsubscribe) => unsubscribe(),
-                [this, listener, value, NotifierDeep.get(this).key(keys)],
+            const value = useClearedValueSubscription(
+                this.get(keys as any),
+                () => this.get(keys as any),
+                listener,
+                (listener) => this.subscribe(keys as any, listener),
+                [this, listener, NotifierDeep.get(this).key(keys)],
             );
 
             return value.current;

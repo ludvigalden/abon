@@ -6,7 +6,7 @@ import { composedSubscription } from "./abon-utils";
 import { Notifier } from "./notifier";
 import { ReadonlyAbon } from "./readonly-abon";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
-import { useMountedForceUpdate, validateListener } from "./utils";
+import { useClearedValueSubscription, useMountedForceUpdate, validateListener } from "./utils";
 
 /** Inherits a value from children if the current value is undefined. */
 export class ReadonlyAbonInheritedUp<T> implements ReadonlyAbon<T> {
@@ -69,12 +69,14 @@ export class ReadonlyAbonInheritedUp<T> implements ReadonlyAbon<T> {
     }
 
     use() {
-        const listener = useMountedForceUpdate();
+        const forceUpdate = useMountedForceUpdate();
 
-        useClearedMemo(
-            () => this.subscribe(listener),
-            (unsubscribe) => unsubscribe(),
-            [this, listener],
+        useClearedValueSubscription(
+            this.current,
+            () => this.current,
+            forceUpdate,
+            (listener) => this.subscribe(listener),
+            [this, forceUpdate],
         );
 
         return this;

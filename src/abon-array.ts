@@ -4,7 +4,7 @@ import { useClearedMemo } from "use-cleared-memo";
 
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
-import { useMountedForceUpdate, validateListener } from "./utils";
+import { useClearedValueSubscription, useMountedForceUpdate, validateListener } from "./utils";
 
 /** Subscribe to and update a normal array. */
 export class AbonArray<T> extends Array<T> {
@@ -134,12 +134,14 @@ export class AbonArray<T> extends Array<T> {
     }
 
     use() {
-        const listener = useMountedForceUpdate();
+        const forceUpdate = useMountedForceUpdate();
 
-        useClearedMemo(
-            () => this.subscribe(listener),
-            (unsubscribe) => unsubscribe(),
-            [this, listener],
+        useClearedValueSubscription(
+            this.current,
+            () => this.current,
+            forceUpdate,
+            (listener) => this.subscribe(listener),
+            [this, forceUpdate],
         );
 
         return this;
