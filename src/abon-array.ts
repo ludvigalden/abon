@@ -15,6 +15,9 @@ export class AbonArray<T> extends Array<T> {
     }
 
     set(items: T[]) {
+        if (!items || !Array.isArray(items)) {
+            items = [];
+        }
         if (!isEqual(this.current, items)) {
             this.current = items;
             Notifier.get<T[]>(this).notify(items);

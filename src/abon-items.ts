@@ -120,7 +120,7 @@ export class AbonItems<T extends object, I extends keyof T>
 
         if (!keys.length) {
             if (!Array.isArray(value)) {
-                let current: ItemRecord<T, I> = value;
+                let current: ItemRecord<T, I> = value || {};
 
                 (Object.keys(current) as ItemRecordKey<T, I>[]).forEach((id) => {
                     if (!this.ids.includes(id)) {

@@ -54,7 +54,10 @@ export class AbonMap<K, V> extends Map<K, V> {
                 this.notify(notify);
             }
         } else {
-            const [record] = args as [Record<K & keyof any, V>];
+            let [record] = args as [Record<K & keyof any, V>];
+            if (!record) {
+                record = {} as any;
+            }
 
             const notify: K[] = [];
             let notifyDelete = false;
