@@ -38,3 +38,7 @@ export type SubscriberFlexResult = UnsubscribeFn | boolean | undefined | null | 
 export type ComposedSubscriberFlexResult = SubscriberFlexResult | Iterable<SubscriberFlexResult>;
 
 export type ComposedSubscriberFlex = (listener: () => void) => ComposedSubscriberFlexResult;
+
+export interface AsyncChangeListener<T> {
+    (current: T): void | Promise<void>;
+}
