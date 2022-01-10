@@ -1,11 +1,12 @@
 import isEqual from "lodash/isEqual";
 import React from "react";
 import { useClearedMemo } from "use-cleared-memo";
+import { useSafeForceUpdate } from "use-safe-force-update";
 
 import { Abon } from "./abon";
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
-import { useClearedValueSubscription, useMountedForceUpdate, validateListener } from "./utils";
+import { useClearedValueSubscription, validateListener } from "./utils";
 
 /** Subscribe to, retrieve, and asynchronously update a value, where an action to set a value can be interrupted.
  * `AbonAsync` is not intended to be used by itself, but rather to be extended and implementing the `set` method. */
@@ -109,7 +110,7 @@ export class AbonAsync<T> implements Omit<Abon<T>, "set" | "use"> {
     }
 
     use() {
-        const forceUpdate = useMountedForceUpdate();
+        const forceUpdate = useSafeForceUpdate();
 
         useClearedValueSubscription(
             this.current,

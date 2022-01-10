@@ -62,19 +62,11 @@ describe("AbonArray", () => {
 
         expect(array.length).toBe(3);
 
-        promises.push(
-            expect(
-                resolve<T>((listener) => array.subscribe((items) => listener(items[0]))),
-            ).resolves.toBe(item1),
-        );
+        promises.push(expect(resolve<T>((listener) => array.subscribe((items) => listener(items[0])))).resolves.toBe(item1));
 
         array.unshift(item1);
 
-        promises.push(
-            expect(
-                resolve<T>((listener) => array.subscribe((items) => listener(items[0]))),
-            ).resolves.toBe(undefined),
-        );
+        promises.push(expect(resolve<T>((listener) => array.subscribe((items) => listener(items[0])))).resolves.toBe(undefined));
 
         array.set([]);
 

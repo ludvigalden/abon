@@ -1,13 +1,14 @@
 import isEqual from "lodash/isEqual";
 import React from "react";
 import { useClearedMemo } from "use-cleared-memo";
+import { useSafeForceUpdate } from "use-safe-force-update";
 
 import { AbonDeep } from "./abon-deep";
 import { AbonMap } from "./abon-map";
 import { AbonSet } from "./abon-set";
 import { ReadonlyAbon } from "./readonly-abon";
 import { ComposedSubscriberFlex, ComposedSubscriberFlexResult, Subscribeable, UnsubscribeFn } from "./types";
-import { useMountedForceUpdate, validateListener } from "./utils";
+import { validateListener } from "./utils";
 
 export function composedSubscription(listener: () => void, listen: ComposedSubscriberFlex): UnsubscribeFn {
     validateListener(listener);
@@ -155,7 +156,7 @@ export function useHydratedComposedHandler(
 }
 
 export function useComposedValue<T>(getValue: () => T, listen: ComposedSubscriberFlex, deps: readonly any[] = []): T {
-    const forceUpdate = useMountedForceUpdate();
+    const forceUpdate = useSafeForceUpdate();
     const value = React.useRef<T>();
 
     useClearedMemo(
@@ -181,7 +182,7 @@ export function useHydratedComposedValue<T>(
     listenHydrate: ComposedSubscriberFlex,
     deps: readonly any[] = [],
 ): T {
-    const forceUpdate = useMountedForceUpdate();
+    const forceUpdate = useSafeForceUpdate();
     const value = React.useRef<T>();
 
     useClearedMemo(
@@ -210,7 +211,7 @@ export function useComposedValueAsync<T>(
     listen: ComposedSubscriberFlex,
     deps: readonly any[] = [],
 ): T | undefined {
-    const forceUpdate = useMountedForceUpdate();
+    const forceUpdate = useSafeForceUpdate();
     const value = React.useRef<T>();
     const getting = React.useRef<symbol>();
 

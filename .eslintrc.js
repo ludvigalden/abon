@@ -4,13 +4,10 @@ module.exports = {
         "plugin:prettier/recommended",
         "plugin:import/errors",
         "plugin:import/warnings",
-        "prettier/babel",
         "prettier",
         "plugin:@typescript-eslint/recommended",
         "plugin:import/typescript",
-        "prettier/@typescript-eslint",
         "plugin:react/recommended",
-        "prettier/react",
     ],
     plugins: ["babel", "import", "prettier", "react", "unused-imports"],
     env: {
@@ -123,7 +120,7 @@ module.exports = {
             2,
             {
                 "newlines-between": "always",
-                groups: ["external", "internal", ["parent", "sibling"], "index"],
+                groups: ["external", "unknown", "internal", ["parent", "sibling"], "index"],
                 alphabetize: {
                     order: "asc",
                     caseInsensitive: true,
@@ -150,7 +147,7 @@ module.exports = {
         "prefer-object-spread": 1,
         "no-duplicate-imports": 2,
         "no-return-await": 2,
-        "no-invalid-this": 1,
+        "no-invalid-this": 0,
         "no-invalid-template-strings": 0,
         "no-arg": 0,
         "no-confusing-arrow": 0,
@@ -180,10 +177,6 @@ module.exports = {
         "react/jsx-uses-react": "warn",
         "react/jsx-uses-vars": "warn",
         "react/no-danger-with-children": "warn",
-        // Disabled because of undesirable warnings
-        // See https://github.com/facebook/create-react-app/issues/5204 for
-        // blockers until its re-enabled
-        // 'react/no-deprecated': 'warn',
         "react/no-direct-mutation-state": "warn",
         "react/no-is-mounted": "warn",
         "react/no-typos": "error",

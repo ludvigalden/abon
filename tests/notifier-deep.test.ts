@@ -1,4 +1,4 @@
-import { NotifierDeep } from "../src/notifier";
+import { NotifierDeep } from "../src/notifier-deep";
 
 describe("NotifierDeep", () => {
     it("gets matches", () => {

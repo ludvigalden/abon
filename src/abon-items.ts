@@ -25,7 +25,8 @@ export class AbonItems<T extends object, I extends keyof T>
             | "filter"
             | "includes"
             | "length"
-        > {
+        >
+{
     ids: AbonArray<T[I]>["readonly"];
 
     constructor(readonly idKey: I, initial?: T[]) {
@@ -72,14 +73,14 @@ export class AbonItems<T extends object, I extends keyof T>
         K2 extends keyof T[K1],
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
-        K5 extends keyof T[K1][K2][K3][K4]
+        K5 extends keyof T[K1][K2][K3][K4],
     >(id: T[I], _1: K1, _2: K2, _3: K3, _4: K4, _5: K5, value: T[K1][K2][K3][K4][K5]): this;
     set<
         K1 extends keyof T,
         K2 extends keyof T[K1],
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
-        K5 extends keyof T[K1][K2][K3][K4]
+        K5 extends keyof T[K1][K2][K3][K4],
     >(keys: [T[I], K1, K2, K3, K4, K5], value: T[K1][K2][K3][K4][K5]): this;
     set<
         K1 extends keyof T,
@@ -87,7 +88,7 @@ export class AbonItems<T extends object, I extends keyof T>
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
-        K6 extends keyof T[K1][K2][K3][K4][K5]
+        K6 extends keyof T[K1][K2][K3][K4][K5],
     >(id: T[I], _1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, value: T[K1][K2][K3][K4][K5][K6]): this;
     set<
         K1 extends keyof T,
@@ -95,7 +96,7 @@ export class AbonItems<T extends object, I extends keyof T>
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
-        K6 extends keyof T[K1][K2][K3][K4][K5]
+        K6 extends keyof T[K1][K2][K3][K4][K5],
     >(keys: [T[I], K1, K2, K3, K4, K5, K6], value: T[K1][K2][K3][K4][K5][K6]): this;
     set<
         K1 extends keyof T,
@@ -104,7 +105,7 @@ export class AbonItems<T extends object, I extends keyof T>
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
-        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6],
     >(id: T[I], _1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, _7: K6, value: T[K1][K2][K3][K4][K5][K6][K7]): this;
     set<
         K1 extends keyof T,
@@ -113,7 +114,7 @@ export class AbonItems<T extends object, I extends keyof T>
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
-        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6],
     >(keys: [T[I], K1, K2, K3, K4, K5, K6, K7], value: T[K1][K2][K3][K4][K5][K6][K7]): this;
     set(...args: any[]): this {
         const { keys, value } = AbonDeep.parseKeyValueArgs(args);
@@ -439,14 +440,14 @@ export class AbonItems<T extends object, I extends keyof T>
         K2 extends keyof T[K1],
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
-        K5 extends keyof T[K1][K2][K3][K4]
+        K5 extends keyof T[K1][K2][K3][K4],
     >(id: T[I], _1: K1, _2: K2, _3: K3, _4: K4, _5: K5, listener: ChangeListener<T[K1][K2][K3][K4][K5]>): UnsubscribeFn;
     subscribe<
         K1 extends keyof T,
         K2 extends keyof T[K1],
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
-        K5 extends keyof T[K1][K2][K3][K4]
+        K5 extends keyof T[K1][K2][K3][K4],
     >(keys: [T[I], K1, K2, K3, K4, K5], listener: ChangeListener<T[K1][K2][K3][K4][K5]>): UnsubscribeFn;
     subscribe<
         K1 extends keyof T,
@@ -454,7 +455,7 @@ export class AbonItems<T extends object, I extends keyof T>
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
-        K6 extends keyof T[K1][K2][K3][K4][K5]
+        K6 extends keyof T[K1][K2][K3][K4][K5],
     >(id: T[I], _1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, listener: ChangeListener<T[K1][K2][K3][K4][K5][K6]>): UnsubscribeFn;
     subscribe<
         K1 extends keyof T,
@@ -462,7 +463,7 @@ export class AbonItems<T extends object, I extends keyof T>
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
-        K6 extends keyof T[K1][K2][K3][K4][K5]
+        K6 extends keyof T[K1][K2][K3][K4][K5],
     >(keys: [T[I], K1, K2, K3, K4, K5, K6], listener: ChangeListener<T[K1][K2][K3][K4][K5][K6]>): UnsubscribeFn;
     subscribe<
         K1 extends keyof T,
@@ -471,7 +472,7 @@ export class AbonItems<T extends object, I extends keyof T>
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
-        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6],
     >(
         id: T[I],
         _1: K1,
@@ -490,7 +491,7 @@ export class AbonItems<T extends object, I extends keyof T>
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
-        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6],
     >(keys: [T[I], K1, K2, K3, K4, K5, K6, K7], listener: ChangeListener<T[K1][K2][K3][K4][K5][K6][K7]>): UnsubscribeFn;
     subscribe(...args: any[]) {
         return super.subscribe(...(args as [any]));
@@ -521,14 +522,14 @@ export class AbonItems<T extends object, I extends keyof T>
         K2 extends keyof T[K1],
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
-        K5 extends keyof T[K1][K2][K3][K4]
+        K5 extends keyof T[K1][K2][K3][K4],
     >(id: T[I], _1: K1, _2: K2, _3: K3, _4: K4, _5: K5): T[K1][K2][K3][K4][K5];
     get<
         K1 extends keyof T,
         K2 extends keyof T[K1],
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
-        K5 extends keyof T[K1][K2][K3][K4]
+        K5 extends keyof T[K1][K2][K3][K4],
     >(keys: [T[I], K1, K2, K3, K4, K5]): T[K1][K2][K3][K4][K5];
     get<
         K1 extends keyof T,
@@ -536,7 +537,7 @@ export class AbonItems<T extends object, I extends keyof T>
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
-        K6 extends keyof T[K1][K2][K3][K4][K5]
+        K6 extends keyof T[K1][K2][K3][K4][K5],
     >(id: T[I], _1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6): T[K1][K2][K3][K4][K5][K6];
     get<
         K1 extends keyof T,
@@ -544,7 +545,7 @@ export class AbonItems<T extends object, I extends keyof T>
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
-        K6 extends keyof T[K1][K2][K3][K4][K5]
+        K6 extends keyof T[K1][K2][K3][K4][K5],
     >(keys: [T[I], K1, K2, K3, K4, K5, K6]): T[K1][K2][K3][K4][K5][K6];
     get<
         K1 extends keyof T,
@@ -553,7 +554,7 @@ export class AbonItems<T extends object, I extends keyof T>
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
-        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6],
     >(id: T[I], _1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, _7: K6): T[K1][K2][K3][K4][K5][K6][K7];
     get<
         K1 extends keyof T,
@@ -562,7 +563,7 @@ export class AbonItems<T extends object, I extends keyof T>
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
-        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6],
     >(keys: [T[I], K1, K2, K3, K4, K5, K6, K7]): T[K1][K2][K3][K4][K5][K6][K7];
     get(...args: any[]): any {
         return super.get(...(args as [any]));
@@ -642,7 +643,7 @@ interface ReadonlyAbonItems<T extends object, I extends keyof T>
         K2 extends keyof T[K1],
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
-        K5 extends keyof T[K1][K2][K3][K4]
+        K5 extends keyof T[K1][K2][K3][K4],
     >(
         _1: K1,
         _2: K2,
@@ -655,7 +656,7 @@ interface ReadonlyAbonItems<T extends object, I extends keyof T>
         K2 extends keyof T[K1],
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
-        K5 extends keyof T[K1][K2][K3][K4]
+        K5 extends keyof T[K1][K2][K3][K4],
     >(
         keys: [K1, K2, K3, K4, K5],
     ): T[K1][K2][K3][K4][K5];
@@ -665,7 +666,7 @@ interface ReadonlyAbonItems<T extends object, I extends keyof T>
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
-        K6 extends keyof T[K1][K2][K3][K4][K5]
+        K6 extends keyof T[K1][K2][K3][K4][K5],
     >(
         _1: K1,
         _2: K2,
@@ -680,7 +681,7 @@ interface ReadonlyAbonItems<T extends object, I extends keyof T>
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
-        K6 extends keyof T[K1][K2][K3][K4][K5]
+        K6 extends keyof T[K1][K2][K3][K4][K5],
     >(
         keys: [K1, K2, K3, K4, K5, K6],
     ): T[K1][K2][K3][K4][K5][K6];
@@ -691,7 +692,7 @@ interface ReadonlyAbonItems<T extends object, I extends keyof T>
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
-        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6],
     >(
         _1: K1,
         _2: K2,
@@ -708,7 +709,7 @@ interface ReadonlyAbonItems<T extends object, I extends keyof T>
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
-        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6],
     >(
         keys: [K1, K2, K3, K4, K5, K6, K7],
     ): T[K1][K2][K3][K4][K5][K6][K7];

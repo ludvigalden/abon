@@ -3,7 +3,7 @@ import merge from "lodash/merge";
 import set from "lodash/set";
 import React from "react";
 
-import { NotifierDeep } from "./notifier";
+import { NotifierDeep } from "./notifier-deep";
 import { ReadonlyAbonDeep } from "./readonly-abon-deep";
 
 /** Subscribe to, retrieve, and set deeply nested values. */
@@ -40,14 +40,14 @@ export class AbonDeep<T extends object> extends ReadonlyAbonDeep<T> {
         K2 extends keyof T[K1],
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
-        K5 extends keyof T[K1][K2][K3][K4]
+        K5 extends keyof T[K1][K2][K3][K4],
     >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, value: T[K1][K2][K3][K4][K5]): this;
     set<
         K1 extends keyof T,
         K2 extends keyof T[K1],
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
-        K5 extends keyof T[K1][K2][K3][K4]
+        K5 extends keyof T[K1][K2][K3][K4],
     >(keys: [K1, K2, K3, K4, K5], value: T[K1][K2][K3][K4][K5]): this;
     set<
         K1 extends keyof T,
@@ -55,7 +55,7 @@ export class AbonDeep<T extends object> extends ReadonlyAbonDeep<T> {
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
-        K6 extends keyof T[K1][K2][K3][K4][K5]
+        K6 extends keyof T[K1][K2][K3][K4][K5],
     >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, value: T[K1][K2][K3][K4][K5][K6]): this;
     set<
         K1 extends keyof T,
@@ -63,7 +63,7 @@ export class AbonDeep<T extends object> extends ReadonlyAbonDeep<T> {
         K3 extends keyof T[K1][K2],
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
-        K6 extends keyof T[K1][K2][K3][K4][K5]
+        K6 extends keyof T[K1][K2][K3][K4][K5],
     >(keys: [K1, K2, K3, K4, K5, K6], value: T[K1][K2][K3][K4][K5][K6]): this;
     set<
         K1 extends keyof T,
@@ -72,7 +72,7 @@ export class AbonDeep<T extends object> extends ReadonlyAbonDeep<T> {
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
-        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6],
     >(_1: K1, _2: K2, _3: K3, _4: K4, _5: K5, _6: K6, _7: K6, value: T[K1][K2][K3][K4][K5][K6][K7]): this;
     set<
         K1 extends keyof T,
@@ -81,7 +81,7 @@ export class AbonDeep<T extends object> extends ReadonlyAbonDeep<T> {
         K4 extends keyof T[K1][K2][K3],
         K5 extends keyof T[K1][K2][K3][K4],
         K6 extends keyof T[K1][K2][K3][K4][K5],
-        K7 extends keyof T[K1][K2][K3][K4][K5][K6]
+        K7 extends keyof T[K1][K2][K3][K4][K5][K6],
     >(keys: [K1, K2, K3, K4, K5, K6, K7], value: T[K1][K2][K3][K4][K5][K6][K7]): this;
     set(...args: any[]) {
         const { keys, value } = AbonDeep.parseKeyValueArgs(args);

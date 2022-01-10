@@ -1,8 +1,9 @@
 import { useClearedMemo } from "use-cleared-memo";
+import { useSafeForceUpdate } from "use-safe-force-update";
 
 import { Notifier } from "./notifier";
 import { ChangeListener, Subscribeable, UnsubscribeFn, ValueHandler } from "./types";
-import { useClearedValueSubscription, useMountedForceUpdate, validateListener } from "./utils";
+import { useClearedValueSubscription, validateListener } from "./utils";
 
 /** Retrieve and subscribe to a value. */
 export class ReadonlyAbon<T> implements Subscribeable<T> {
@@ -24,7 +25,7 @@ export class ReadonlyAbon<T> implements Subscribeable<T> {
     }
 
     use() {
-        const forceUpdate = useMountedForceUpdate();
+        const forceUpdate = useSafeForceUpdate();
 
         useClearedValueSubscription(
             this.current,

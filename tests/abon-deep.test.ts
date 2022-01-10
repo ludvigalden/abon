@@ -49,19 +49,11 @@ describe("AbonDeep", () => {
 
         value.set({ h: 1 });
 
-        promises.push(
-            expect(
-                resolve<VH>((listener) => value.subscribe(listener)),
-            ).resolves.toMatchObject({ h: 2 }),
-        );
+        promises.push(expect(resolve<VH>((listener) => value.subscribe(listener))).resolves.toMatchObject({ h: 2 }));
 
         value.set({ h: 2 });
 
-        promises.push(
-            expect(
-                resolve<VH>((listener) => value.subscribe(listener)),
-            ).resolves.toMatchObject({ h: 3 }),
-        );
+        promises.push(expect(resolve<VH>((listener) => value.subscribe(listener))).resolves.toMatchObject({ h: 3 }));
 
         value.set("h", 3);
 
@@ -75,11 +67,7 @@ describe("AbonDeep", () => {
 
         value.set("a", "b", "c", { d: { e: 0 }, f: 0 });
 
-        promises.push(
-            expect(
-                resolve<number>((listener) => value.subscribe("a", "b", "c", "d", "e", listener)),
-            ).resolves.toBe(1),
-        );
+        promises.push(expect(resolve<number>((listener) => value.subscribe("a", "b", "c", "d", "e", listener))).resolves.toBe(1));
 
         value.set(["a", "b", "c", "d", "e"], 1);
 

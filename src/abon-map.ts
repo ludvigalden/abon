@@ -1,10 +1,11 @@
 import isEqual from "lodash/isEqual";
 import React from "react";
 import { useClearedMemo } from "use-cleared-memo";
+import { useSafeForceUpdate } from "use-safe-force-update";
 
-import { NotifierDeep } from "./notifier";
+import { NotifierDeep } from "./notifier-deep";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
-import { useClearedValueSubscription, useMountedForceUpdate, validateListener } from "./utils";
+import { useClearedValueSubscription, validateListener } from "./utils";
 
 /** Subscribe to and set the entries of a `Map`. */
 export class AbonMap<K, V> extends Map<K, V> {
@@ -157,7 +158,7 @@ export class AbonMap<K, V> extends Map<K, V> {
     use(key: K): V | undefined;
     use(): this;
     use(key?: K): V | undefined | this {
-        const forceUpdate = useMountedForceUpdate();
+        const forceUpdate = useSafeForceUpdate();
 
         useClearedValueSubscription(
             key != null ? this.get(key) : this,

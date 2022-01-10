@@ -56,11 +56,7 @@ describe("AbonItems", () => {
 
         items.push({ id: 20, value: 1 });
 
-        promises.push(
-            expect(
-                resolve<number>((listener) => items.subscribe(20, "value", listener)),
-            ).resolves.toBe(2),
-        );
+        promises.push(expect(resolve<number>((listener) => items.subscribe(20, "value", listener))).resolves.toBe(2));
 
         items.set(20, "value", 2);
 
@@ -74,11 +70,7 @@ describe("AbonItems", () => {
 
         items.push({ id: 50, value: 1 });
 
-        promises.push(
-            expect(
-                resolve<number>((listener) => items.subscribe((_, values) => listener(values.length))),
-            ).resolves.toBe(2),
-        );
+        promises.push(expect(resolve<number>((listener) => items.subscribe((_, values) => listener(values.length)))).resolves.toBe(2));
 
         items.push({ id: 100 });
 

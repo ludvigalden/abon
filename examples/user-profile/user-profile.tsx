@@ -1,8 +1,8 @@
 import React from "react";
 
-import { UserState } from "./user-state";
 import UserProfileAvatar from "./user-profile.avatar";
 import UserProfileName from "./user-profile.name";
+import { UserState } from "./user-state";
 
 export default function UserProfile(props: UserProfileProps) {
     const state = React.useMemo(() => new UserState(props.id), [props.id]);

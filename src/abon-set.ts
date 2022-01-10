@@ -1,9 +1,10 @@
 import React from "react";
 import { useClearedMemo } from "use-cleared-memo";
+import { useSafeForceUpdate } from "use-safe-force-update";
 
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
-import { Falsey, useMountedForceUpdate, validateListener } from "./utils";
+import { Falsey, validateListener } from "./utils";
 
 /** Subscribe to and set the values of a `Set`. */
 export class AbonSet<T> extends Set<T> {
@@ -133,7 +134,7 @@ export class AbonSet<T> extends Set<T> {
     }
 
     use() {
-        const listener = useMountedForceUpdate();
+        const listener = useSafeForceUpdate();
 
         useClearedMemo(
             () => this.subscribe(listener),

@@ -1,10 +1,11 @@
 import isEqual from "lodash/isEqual";
 import React from "react";
 import { useClearedMemo } from "use-cleared-memo";
+import { useSafeForceUpdate } from "use-safe-force-update";
 
 import { Notifier } from "./notifier";
 import { ChangeListener, UnsubscribeFn, ValueHandler } from "./types";
-import { useClearedValueSubscription, useMountedForceUpdate, validateListener } from "./utils";
+import { useClearedValueSubscription, validateListener } from "./utils";
 
 /** Subscribe to and update a normal array. */
 export class AbonArray<T> extends Array<T> {
@@ -137,7 +138,7 @@ export class AbonArray<T> extends Array<T> {
     }
 
     use() {
-        const forceUpdate = useMountedForceUpdate();
+        const forceUpdate = useSafeForceUpdate();
 
         useClearedValueSubscription(
             this.current,
